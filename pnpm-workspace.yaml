@@ -8,7 +8,7 @@ catalog:
   # React & Next.js
   react: ^19.0.0
   react-dom: ^19.0.0
-  next: ^15.1.4  # Will upgrade to 16 when released
+  next: ^16.0.1
 
   # TypeScript
   typescript: ^5.7.2
@@ -23,7 +23,7 @@ catalog:
 
   # ESLint
   eslint: ^9.18.0
-  eslint-config-next: ^15.1.4
+  eslint-config-next: ^16.0.1
   "@eslint/js": ^9.18.0
   typescript-eslint: ^8.20.0
   eslint-config-prettier: ^9.1.0
