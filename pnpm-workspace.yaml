@@ -1,0 +1,38 @@
+packages:
+  - "apps/*"
+  - "configs/*"
+  - "packages/**"
+  - "pages/*"
+
+catalog:
+  # React & Next.js
+  react: ^19.0.0
+  react-dom: ^19.0.0
+  next: ^15.1.4  # Will upgrade to 16 when released
+
+  # TypeScript
+  typescript: ^5.7.2
+  "@types/node": ^22.10.5
+  "@types/react": ^19.0.6
+  "@types/react-dom": ^19.0.3
+
+  # Tailwind CSS
+  tailwindcss: ^3.4.17
+  autoprefixer: ^10.4.20
+  postcss: ^8.4.49
+
+  # ESLint
+  eslint: ^9.18.0
+  eslint-config-next: ^15.1.4
+  "@eslint/js": ^9.18.0
+  typescript-eslint: ^8.20.0
+  eslint-config-prettier: ^9.1.0
+  eslint-plugin-react: ^7.37.3
+
+  # Prettier
+  prettier: ^3.4.2
+  prettier-plugin-tailwindcss: ^0.6.10
+
+  # Build tools
+  turbo: ^2.3.3
+  tsup: ^8.3.5
