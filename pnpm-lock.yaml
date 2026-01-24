@@ -95,6 +95,9 @@ importers:
       next:
         specifier: 'catalog:'
         version: 16.1.4(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      pages.home:
+        specifier: workspace:*
+        version: link:../../packages/pages/home
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -207,6 +210,34 @@ importers:
       configs.typescript:
         specifier: workspace:*
         version: link:../../../../configs/typescript
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.2(jiti@1.21.7)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/pages/home:
+    dependencies:
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.9
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.9)
+      configs.eslint:
+        specifier: workspace:*
+        version: link:../../../configs/eslint
+      configs.typescript:
+        specifier: workspace:*
+        version: link:../../../configs/typescript
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@1.21.7)

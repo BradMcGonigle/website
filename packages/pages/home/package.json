@@ -1,0 +1,28 @@
+{
+  "name": "pages.home",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Home page component",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo node_modules"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "configs.eslint": "workspace:*",
+    "configs.typescript": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

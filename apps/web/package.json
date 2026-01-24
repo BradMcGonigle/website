@@ -13,6 +13,7 @@
   "dependencies": {
     "geist": "catalog:",
     "next": "catalog:",
+    "pages.home": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
