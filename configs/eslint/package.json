@@ -1,0 +1,19 @@
+{
+  "name": "configs.eslint",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared ESLint configurations for the monorepo",
+  "files": [
+    "*.js",
+    "*.mjs"
+  ],
+  "dependencies": {
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-config-next": "catalog:",
+    "eslint-plugin-react": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "typescript-eslint": "catalog:"
+  }
+}
