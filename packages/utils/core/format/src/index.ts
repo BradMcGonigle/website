@@ -3,8 +3,8 @@
  */
 export function formatCurrency(
   amount: number,
-  currency: string = "USD",
-  locale: string = "en-US"
+  currency = "USD",
+  locale = "en-US"
 ): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -17,7 +17,7 @@ export function formatCurrency(
  */
 export function formatDate(
   date: Date | string,
-  locale: string = "en-US",
+  locale = "en-US",
   options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
@@ -33,7 +33,7 @@ export function formatDate(
  */
 export function formatNumber(
   num: number,
-  locale: string = "en-US",
+  locale = "en-US",
   options: Intl.NumberFormatOptions = {}
 ): string {
   return new Intl.NumberFormat(locale, options).format(num);
