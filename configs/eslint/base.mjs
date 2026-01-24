@@ -11,6 +11,9 @@ export default tseslint.config(
       "**/build/**",
       "**/.turbo/**",
       "**/coverage/**",
+      "**/*.config.{js,mjs,cjs}",
+      "**/.prettierrc.{js,mjs,cjs}",
+      "**/eslint.config.{js,mjs,cjs}",
     ],
   },
   js.configs.recommended,
@@ -50,5 +53,10 @@ export default tseslint.config(
       "@typescript-eslint/no-unnecessary-condition": "error",
       "@typescript-eslint/no-non-null-assertion": "error",
     },
+  },
+  {
+    // Disable type-aware linting for config files
+    files: ["*.mjs", "*.js"],
+    ...tseslint.configs.disableTypeChecked,
   }
 );
