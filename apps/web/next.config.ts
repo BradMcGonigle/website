@@ -7,10 +7,6 @@ const config: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
