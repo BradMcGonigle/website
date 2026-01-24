@@ -3,6 +3,12 @@ packages:
   - "configs/*"
   - "packages/**"
 
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+
+strictDepBuilds: true
+
 catalog:
   # React & Next.js
   react: ^19.0.0
