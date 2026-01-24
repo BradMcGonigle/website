@@ -5,7 +5,7 @@ A customizable button component with variants and sizes.
 ## Usage
 
 ```tsx
-import { Button } from "components.button";
+import { Button } from "components.design-system.button";
 
 export function Example() {
   return (

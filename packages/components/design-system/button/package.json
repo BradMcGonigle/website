@@ -1,5 +1,5 @@
 {
-  "name": "components.button",
+  "name": "components.design-system.button",
   "version": "0.0.0",
   "private": true,
   "description": "Button component",
