@@ -147,6 +147,7 @@ GitHub Actions workflow runs on all PRs to `main`:
 
 - ✅ ESLint checks
 - ✅ TypeScript type checking
+- ✅ Tests (Vitest)
 - ✅ Build verification
 
 All checks must pass before merging.
