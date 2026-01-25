@@ -31,3 +31,10 @@ const className = cn("base", undefined, null, false, "text-lg");
 ## Type Safety
 
 The function accepts an array of string, undefined, null, or false values, making it type-safe for conditional class name generation.
+
+## Testing
+
+```bash
+pnpm test        # Run tests once
+pnpm test:watch  # Run tests in watch mode
+```

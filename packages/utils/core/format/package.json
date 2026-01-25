@@ -11,12 +11,16 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rm -rf .turbo node_modules"
   },
   "devDependencies": {
     "configs.eslint": "workspace:*",
     "configs.typescript": "workspace:*",
+    "configs.vitest": "workspace:*",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

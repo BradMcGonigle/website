@@ -4,6 +4,6 @@
     "baseUrl": ".",
     "outDir": "dist"
   },
-  "include": ["src", "*.mjs"],
+  "include": ["src", "*.mjs", "*.ts"],
   "exclude": ["node_modules", "dist"]
 }
