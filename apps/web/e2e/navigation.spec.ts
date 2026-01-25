@@ -49,8 +49,14 @@ test.describe("Navigation", () => {
   test("skip to content link works", async ({ page }) => {
     await page.goto("/");
 
-    // Tab to reveal skip link and activate it
+    // Tab to reveal skip link
     await page.keyboard.press("Tab");
+
+    // Verify skip link is now visible and focused
+    const skipLink = page.getByRole("link", { name: "Skip to main content" });
+    await expect(skipLink).toBeFocused();
+
+    // Activate the skip link
     await page.keyboard.press("Enter");
 
     // Verify focus moved to main content
