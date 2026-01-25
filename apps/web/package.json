@@ -11,8 +11,11 @@
     "clean": "rm -rf .next .turbo node_modules"
   },
   "dependencies": {
+    "components.layout.footer": "workspace:*",
+    "components.layout.header": "workspace:*",
     "geist": "catalog:",
     "next": "catalog:",
+    "pages.about": "workspace:*",
     "pages.home": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"

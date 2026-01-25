@@ -1,12 +1,14 @@
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
-        <h1 className="text-4xl font-bold">Welcome to the Monorepo</h1>
+    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+      <section aria-labelledby="hero-heading">
+        <h1 id="hero-heading" className="text-4xl font-bold">
+          Brad McGonigle
+        </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          A modern monorepo with Turborepo, pnpm, Next.js 16, and Tailwind CSS
+          Welcome to my personal website.
         </p>
-      </div>
-    </main>
+      </section>
+    </div>
   );
 }

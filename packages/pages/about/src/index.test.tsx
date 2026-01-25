@@ -6,7 +6,7 @@ describe("AboutPage", () => {
   it("renders the about heading", () => {
     render(<AboutPage />);
     expect(
-      screen.getByRole("heading", { name: "About" })
+      screen.getByRole("heading", { name: "About", level: 1 })
     ).toBeInTheDocument();
   });
 
@@ -17,8 +17,8 @@ describe("AboutPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders as a main element", () => {
+  it("renders within an article element for semantic structure", () => {
     render(<AboutPage />);
-    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(screen.getByRole("article")).toBeInTheDocument();
   });
 });

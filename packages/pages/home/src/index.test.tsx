@@ -3,22 +3,23 @@ import { describe, expect, it } from "vitest";
 import HomePage from "./index";
 
 describe("HomePage", () => {
-  it("renders the welcome heading", () => {
+  it("renders the heading with the site owner name", () => {
     render(<HomePage />);
     expect(
-      screen.getByRole("heading", { name: "Welcome to the Monorepo" })
+      screen.getByRole("heading", { name: "Brad McGonigle", level: 1 })
     ).toBeInTheDocument();
   });
 
-  it("renders the description text", () => {
+  it("renders the welcome text", () => {
     render(<HomePage />);
     expect(
-      screen.getByText(/modern monorepo with Turborepo, pnpm, Next.js/i)
+      screen.getByText(/Welcome to my personal website/i)
     ).toBeInTheDocument();
   });
 
-  it("renders as a main element", () => {
+  it("has a properly labeled hero section", () => {
     render(<HomePage />);
-    expect(screen.getByRole("main")).toBeInTheDocument();
+    const section = screen.getByRole("region", { name: /Brad McGonigle/i });
+    expect(section).toBeInTheDocument();
   });
 });
