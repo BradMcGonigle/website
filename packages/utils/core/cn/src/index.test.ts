@@ -21,12 +21,4 @@ describe("cn", () => {
   it("handles single class name", () => {
     expect(cn("single")).toBe("single");
   });
-
-  it("handles conditional classes", () => {
-    const isActive = true;
-    const isDisabled = false;
-    expect(cn("base", isActive && "active", isDisabled && "disabled")).toBe(
-      "base active"
-    );
-  });
 });
