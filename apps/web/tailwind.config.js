@@ -5,6 +5,10 @@ module.exports = {
   ...baseConfig,
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../packages/components/**/*.{js,ts,jsx,tsx}",
+    // Component packages - explicitly list to avoid node_modules scanning
+    "../../packages/components/design-system/*/src/**/*.{ts,tsx}",
+    "../../packages/components/layout/*/src/**/*.{ts,tsx}",
+    // Page packages
+    "../../packages/pages/*/src/**/*.{ts,tsx}",
   ],
 };
