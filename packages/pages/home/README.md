@@ -37,3 +37,10 @@ This page can be customized by:
 - Modifying the content directly in the package
 - Wrapping it with additional layout/data in your app
 - Passing props (if extended to accept them)
+
+## Testing
+
+```bash
+pnpm test        # Run tests once
+pnpm test:watch  # Run tests in watch mode
+```

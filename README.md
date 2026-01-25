@@ -12,7 +12,8 @@ website/
 │   ├── eslint/                       # Shared ESLint configs (base, Next.js, React library)
 │   ├── prettier/                     # Shared Prettier config with Tailwind plugin
 │   ├── tailwind/                     # Shared Tailwind config with design tokens
-│   └── typescript/                   # Shared TypeScript configs
+│   ├── typescript/                   # Shared TypeScript configs
+│   └── vitest/                       # Shared Vitest configs (base, React)
 └── packages/
     ├── components/
     │   └── design-system/
@@ -78,6 +79,9 @@ pnpm typecheck
 # Lint all packages
 pnpm lint
 
+# Run tests
+pnpm test
+
 # Format code
 pnpm format
 ```
@@ -94,6 +98,7 @@ pnpm format
 
 ### Code Quality
 
+- **Testing**: Vitest with React Testing Library
 - **Linting**: ESLint 9 with flat config format
 - **Formatting**: Prettier 3.x with Tailwind CSS plugin
 - **CI/CD**: GitHub Actions for automated checks
@@ -179,9 +184,35 @@ Centralized configs (`configs/*`) ensure:
 - Type safety with shared TypeScript configs
 - Single dependency management via pnpm catalogs
 
+## 🧪 Testing
+
+Tests use [Vitest](https://vitest.dev/) with shared configs from `configs/vitest/`.
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode (per-package)
+cd packages/utils/core/cn && pnpm test:watch
+```
+
+### Test Structure
+
+Each testable package includes:
+- `vitest.config.ts` - Extends shared config
+- `src/*.test.ts(x)` - Test files colocated with source
+
+### Shared Configs
+
+| Config | Environment | Use Case |
+|--------|-------------|----------|
+| `configs.vitest` | Node | Utility packages |
+| `configs.vitest/react` | jsdom | React components |
+
+React component tests use `@testing-library/react` for accessible, behavior-focused testing.
+
 ## 🔮 Future Plans
 
-- Add Vitest for testing
 - Set up shadcn/ui components
 - Add more page packages (about, contact, etc.)
 - Consider additional apps (blog, portfolio, etc.)

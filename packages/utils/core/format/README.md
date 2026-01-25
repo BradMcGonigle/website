@@ -74,3 +74,10 @@ const percent = formatNumber(0.1234, "en-US", {
 - `num` (number): The number to format
 - `locale` (string, optional): Locale string (default: "en-US")
 - `options` (Intl.NumberFormatOptions, optional): Formatting options
+
+## Testing
+
+```bash
+pnpm test        # Run tests once
+pnpm test:watch  # Run tests in watch mode
+```
