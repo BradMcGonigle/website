@@ -16,6 +16,9 @@
       "persistent": true
     },
     "lint": {},
+    "test": {
+      "outputs": ["coverage/**"]
+    },
     "typecheck": {
       "outputs": ["*.tsbuildinfo"]
     },
