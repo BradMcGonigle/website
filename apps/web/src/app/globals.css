@@ -57,3 +57,62 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Blog post prose styling */
+  .prose {
+    --tw-prose-body: hsl(var(--foreground));
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-lead: hsl(var(--muted-foreground));
+    --tw-prose-links: hsl(var(--primary));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-counters: hsl(var(--muted-foreground));
+    --tw-prose-bullets: hsl(var(--muted-foreground));
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--border));
+    --tw-prose-captions: hsl(var(--muted-foreground));
+    --tw-prose-code: hsl(var(--foreground));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: hsl(var(--muted));
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
+  }
+
+  .prose pre {
+    @apply border border-border bg-muted;
+  }
+
+  .prose code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm before:content-none after:content-none;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose blockquote {
+    @apply border-l-primary not-italic;
+  }
+
+  .prose a {
+    @apply font-medium underline underline-offset-4 transition-colors hover:text-primary/80;
+  }
+
+  .prose h2 {
+    @apply mt-10 scroll-m-20 border-b border-border pb-2;
+  }
+
+  .prose h3 {
+    @apply mt-8 scroll-m-20;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply my-6;
+  }
+
+  .prose li {
+    @apply my-2;
+  }
+}
