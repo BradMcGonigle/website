@@ -81,7 +81,7 @@ export default function ChangelogPage({ entries }: ChangelogPageProps) {
               {entry.description && (
                 <p className="mt-3 text-muted-foreground">{entry.description}</p>
               )}
-              <div className="prose prose-neutral mt-4 max-w-none dark:prose-invert">
+              <div className="prose mt-4 dark:prose-invert">
                 {entry.content}
               </div>
             </section>

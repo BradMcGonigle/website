@@ -53,7 +53,7 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
           )}
         </header>
 
-        <div className="prose prose-slate lg:prose-lg dark:prose-invert">
+        <div className="prose lg:prose-lg dark:prose-invert">
           {children}
         </div>
       </article>
