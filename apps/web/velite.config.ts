@@ -1,5 +1,7 @@
 import { defineCollection, defineConfig, s } from "velite";
 import type { UserConfig } from "velite";
+import rehypePrettyCode from "rehype-pretty-code";
+import type { Options } from "rehype-pretty-code";
 
 const blog = defineCollection({
   name: "Post",
@@ -64,6 +66,18 @@ const changelog = defineCollection({
     })),
 });
 
+const prettyCodeOptions: Options = {
+  // Use dual themes for light/dark mode support
+  theme: {
+    dark: "github-dark",
+    light: "github-light",
+  },
+  // Keep background from theme
+  keepBackground: false,
+  // Add data attributes for styling
+  defaultLang: "plaintext",
+};
+
 const config = {
   root: "content",
   output: {
@@ -75,7 +89,7 @@ const config = {
   },
   collections: { blog, projects, changelog },
   mdx: {
-    rehypePlugins: [],
+    rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
     remarkPlugins: [],
   },
 } satisfies UserConfig;

@@ -121,4 +121,80 @@
   .prose li {
     @apply my-2;
   }
+
+  /* rehype-pretty-code syntax highlighting */
+  .prose pre {
+    @apply relative overflow-x-auto rounded-lg border border-border p-4;
+  }
+
+  .prose pre > code {
+    @apply grid text-sm;
+  }
+
+  /* Light/dark theme switching for code blocks */
+  .prose pre code [data-theme="light"],
+  .prose pre code [data-theme="dark"] {
+    /* Both themes rendered, toggle visibility */
+  }
+
+  /* Show light theme by default */
+  [data-theme="dark"] {
+    display: none;
+  }
+
+  [data-theme="light"] {
+    display: inline;
+  }
+
+  /* Show dark theme when .dark class is active */
+  .dark [data-theme="light"] {
+    display: none;
+  }
+
+  .dark [data-theme="dark"] {
+    display: inline;
+  }
+
+  /* Code block background colors */
+  .prose figure[data-rehype-pretty-code-figure] pre {
+    @apply bg-[#f6f8fa];
+  }
+
+  .dark .prose figure[data-rehype-pretty-code-figure] pre {
+    @apply bg-[#0d1117];
+  }
+
+  /* Line highlighting */
+  .prose pre code [data-highlighted-line] {
+    @apply -mx-4 border-l-2 border-primary bg-primary/10 px-4;
+  }
+
+  /* Word highlighting */
+  .prose pre code [data-highlighted-chars] {
+    @apply rounded bg-primary/20 px-1 py-0.5;
+  }
+
+  /* Line numbers */
+  .prose pre code [data-line-numbers] > [data-line]::before {
+    @apply mr-4 inline-block w-4 text-right text-muted-foreground;
+    content: counter(line);
+    counter-increment: line;
+  }
+
+  .prose pre code [data-line-numbers-max-digits="2"] > [data-line]::before {
+    @apply w-6;
+  }
+
+  .prose pre code [data-line-numbers-max-digits="3"] > [data-line]::before {
+    @apply w-8;
+  }
+
+  /* Code block title/caption */
+  .prose figure[data-rehype-pretty-code-figure] figcaption {
+    @apply rounded-t-lg border border-b-0 border-border bg-muted px-4 py-2 font-mono text-sm text-muted-foreground;
+  }
+
+  .prose figure[data-rehype-pretty-code-figure] figcaption + pre {
+    @apply rounded-t-none;
+  }
 }

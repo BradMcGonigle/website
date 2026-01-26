@@ -24,7 +24,9 @@
     "pages.changelog": "workspace:*",
     "pages.home": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "rehype-pretty-code": "^0.14.1",
+    "shiki": "^3.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
