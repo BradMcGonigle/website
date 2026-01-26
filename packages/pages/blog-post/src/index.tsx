@@ -44,7 +44,7 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
             <ul className="mt-4 flex flex-wrap gap-2" aria-label={`Tags for ${post.title}`}>
               {post.tags.map((tag) => (
                 <li key={tag}>
-                  <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/70">
+                  <span className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                     {tag}
                   </span>
                 </li>

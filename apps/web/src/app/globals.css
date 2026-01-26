@@ -82,19 +82,23 @@
   }
 
   .prose pre {
-    @apply border border-border bg-muted;
+    @apply border border-border bg-muted text-foreground;
   }
 
   .prose code {
-    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm before:content-none after:content-none;
+    @apply rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-secondary-foreground before:content-none after:content-none;
   }
 
   .prose pre code {
-    @apply bg-transparent p-0;
+    @apply bg-transparent p-0 text-inherit;
   }
 
   .prose blockquote {
-    @apply border-l-primary not-italic;
+    @apply border-l-primary text-foreground not-italic;
+  }
+
+  .prose blockquote p {
+    @apply text-foreground;
   }
 
   .prose a {
