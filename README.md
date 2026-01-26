@@ -123,6 +123,8 @@ Content files live in `apps/web/content/`:
 apps/web/content/
 ├── blog/           # Blog posts
 │   └── *.mdx
+├── changelog/      # Site changelog entries
+│   └── *.mdx
 └── projects/       # Project showcases
     └── *.mdx
 ```
@@ -167,12 +169,30 @@ order: 1            # Sort order for featured projects
 Project description and details...
 ```
 
+#### Changelog
+
+Create a new file in `apps/web/content/changelog/`:
+
+```mdx
+---
+version: "0.1.0"
+date: 2025-01-26
+title: Initial Release
+description: First release with core features    # Optional
+breaking: false     # Mark breaking changes
+tags:
+  - feature         # feature, fix, improvement, breaking, docs
+---
+
+Release notes and changes...
+```
+
 ### Using Content in Code
 
 Import content collections via the `#content` alias:
 
 ```typescript
-import { blog, projects } from "#content";
+import { blog, projects, changelog } from "#content";
 
 // All posts (typed as Post[])
 const posts = blog;
@@ -180,9 +200,13 @@ const posts = blog;
 // All projects (typed as Project[])
 const allProjects = projects;
 
+// All changelog entries (typed as ChangelogEntry[])
+const entries = changelog;
+
 // Filter examples
 const published = blog.filter((post) => !post.draft);
 const featured = projects.filter((p) => p.featured);
+const features = changelog.filter((e) => e.tags.includes("feature"));
 ```
 
 ### Development

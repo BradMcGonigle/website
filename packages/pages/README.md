@@ -19,7 +19,9 @@ pages/
   │   │   ├── sections/        # Page sections
   │   │   └── hooks/           # Page-specific hooks
   │   └── README.md
-  └── about/
+  ├── about/
+  │   └── ...
+  └── changelog/               # Site changelog page
       └── ...
 ```
 

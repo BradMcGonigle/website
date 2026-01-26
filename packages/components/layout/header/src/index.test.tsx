@@ -42,6 +42,10 @@ describe("Header", () => {
       "href",
       "/about"
     );
+    expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
+      "href",
+      "/changelog"
+    );
   });
 
   it("renders navigation items in a list", () => {
@@ -49,6 +53,6 @@ describe("Header", () => {
     const list = screen.getByRole("list");
     expect(list).toBeInTheDocument();
     const listItems = screen.getAllByRole("listitem");
-    expect(listItems).toHaveLength(2);
+    expect(listItems).toHaveLength(3);
   });
 });
