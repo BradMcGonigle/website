@@ -8,6 +8,7 @@ A modern monorepo built with Turborepo, pnpm workspaces, and Next.js 16, followi
 website/
 ├── apps/
 │   └── web/                          # Next.js 16 app with App Router
+│       └── content/                  # MDX content (blog, projects)
 ├── configs/
 │   ├── eslint/                       # Shared ESLint configs (base, Next.js, React library)
 │   ├── prettier/                     # Shared Prettier config with Tailwind plugin
@@ -95,6 +96,7 @@ pnpm format
 - **Framework**: Next.js 16 with App Router and Turbopack
 - **Language**: TypeScript 5.7 with strict mode
 - **Styling**: Tailwind CSS 3.4 with design system tokens
+- **Content**: Velite for type-safe MDX content collections
 
 ### Code Quality
 
@@ -108,6 +110,94 @@ pnpm format
 - CSS variables for light/dark mode theming
 - Consistent border radius tokens
 - shadcn/ui compatible color scheme
+
+## 📝 Content Management
+
+The web app uses [Velite](https://velite.js.org/) for type-safe content collections, enabling MDX authoring with full TypeScript support.
+
+### Content Location
+
+Content files live in `apps/web/content/`:
+
+```
+apps/web/content/
+├── blog/           # Blog posts
+│   └── *.mdx
+└── projects/       # Project showcases
+    └── *.mdx
+```
+
+### Content Collections
+
+#### Blog Posts
+
+Create a new file in `apps/web/content/blog/`:
+
+```mdx
+---
+title: My Post Title
+description: A brief description of the post
+date: 2025-01-26
+tags:
+  - example
+  - tutorial
+draft: false        # Set to true to hide from production
+---
+
+Your MDX content here...
+```
+
+#### Projects
+
+Create a new file in `apps/web/content/projects/`:
+
+```mdx
+---
+title: Project Name
+description: What the project does
+url: https://example.com          # Live URL (optional)
+repo: https://github.com/...      # Repository URL (optional)
+tech:
+  - Next.js
+  - TypeScript
+featured: true      # Highlight on homepage
+order: 1            # Sort order for featured projects
+---
+
+Project description and details...
+```
+
+### Using Content in Code
+
+Import content collections via the `#content` alias:
+
+```typescript
+import { blog, projects } from "#content";
+
+// All posts (typed as Post[])
+const posts = blog;
+
+// All projects (typed as Project[])
+const allProjects = projects;
+
+// Filter examples
+const published = blog.filter((post) => !post.draft);
+const featured = projects.filter((p) => p.featured);
+```
+
+### Development
+
+Velite runs automatically during development and build:
+
+```bash
+# Development - Velite watches for content changes
+pnpm dev
+
+# Build - Velite processes content before Next.js build
+pnpm build
+```
+
+Output is generated to `apps/web/.velite/` (git-ignored) and includes full TypeScript types.
 
 ## 📦 Creating New Packages
 
@@ -216,5 +306,6 @@ React component tests use `@testing-library/react` for accessible, behavior-focu
 
 - Set up shadcn/ui components
 - Add more page packages (about, contact, etc.)
-- Consider additional apps (blog, portfolio, etc.)
+- Create blog listing and detail pages using Velite content
+- Build project portfolio pages
 - Explore other frameworks (Vue, Svelte) in component packages
