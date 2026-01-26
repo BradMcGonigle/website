@@ -52,8 +52,12 @@ const sharedComponents = {
   a: Anchor,
 };
 
+// Velite compiles MDX to function body strings that must be evaluated at runtime.
+// This is the recommended pattern from Velite documentation.
 function useMDXComponent(code: string) {
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
   const fn = new Function(code);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   return fn({ ...runtime }).default;
 }
 
@@ -63,6 +67,7 @@ interface MDXContentProps {
 }
 
 export function MDXContent({ code, components }: MDXContentProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const Component = useMDXComponent(code);
   return <Component components={{ ...sharedComponents, ...components }} />;
 }
