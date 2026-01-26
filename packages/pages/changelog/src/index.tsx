@@ -61,7 +61,7 @@ export default function ChangelogPage({ entries }: ChangelogPageProps) {
                   </h2>
                   <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="font-mono">v{entry.version}</span>
-                    <span>&middot;</span>
+                    <span aria-hidden="true">&middot;</span>
                     <time dateTime={entry.date}>{formatDate(entry.date)}</time>
                   </div>
                 </div>

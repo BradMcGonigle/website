@@ -36,4 +36,26 @@ test.describe("Smoke Tests", () => {
     await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.getByRole("contentinfo")).toBeVisible();
   });
+
+  test("changelog page loads with correct content", async ({ page }) => {
+    await page.goto("/changelog");
+
+    // Page loaded
+    await expect(page).toHaveTitle(/Changelog/);
+
+    // Critical content visible
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Changelog"
+    );
+
+    // Semantic structure - changelog uses article for content
+    await expect(page.getByRole("article")).toBeVisible();
+
+    // Layout elements present
+    await expect(page.getByRole("banner")).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toBeVisible();
+
+    // At least one changelog entry should be visible
+    await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
+  });
 });
