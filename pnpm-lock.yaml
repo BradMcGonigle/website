@@ -104,6 +104,9 @@ importers:
 
   apps/web:
     dependencies:
+      components.content.mdx:
+        specifier: workspace:*
+        version: link:../../packages/components/content/mdx
       components.layout.footer:
         specifier: workspace:*
         version: link:../../packages/components/layout/footer
@@ -119,6 +122,12 @@ importers:
       pages.about:
         specifier: workspace:*
         version: link:../../packages/pages/about
+      pages.blog-list:
+        specifier: workspace:*
+        version: link:../../packages/pages/blog-list
+      pages.blog-post:
+        specifier: workspace:*
+        version: link:../../packages/pages/blog-post
       pages.changelog:
         specifier: workspace:*
         version: link:../../packages/pages/changelog
@@ -224,6 +233,51 @@ importers:
 
   configs/vitest:
     dependencies:
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.46.0)
+
+  packages/components/content/mdx:
+    devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.9
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.9)
+      configs.eslint:
+        specifier: workspace:*
+        version: link:../../../../configs/eslint
+      configs.typescript:
+        specifier: workspace:*
+        version: link:../../../../configs/typescript
+      configs.vitest:
+        specifier: workspace:*
+        version: link:../../../../configs/vitest
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.2(jiti@1.21.7)
+      jsdom:
+        specifier: 'catalog:'
+        version: 26.1.0
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
       vitest:
         specifier: 'catalog:'
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.46.0)
@@ -367,6 +421,110 @@ importers:
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.46.0)
 
   packages/pages/about:
+    devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.9
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.9)
+      configs.eslint:
+        specifier: workspace:*
+        version: link:../../../configs/eslint
+      configs.typescript:
+        specifier: workspace:*
+        version: link:../../../configs/typescript
+      configs.vitest:
+        specifier: workspace:*
+        version: link:../../../configs/vitest
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.2(jiti@1.21.7)
+      jsdom:
+        specifier: 'catalog:'
+        version: 26.1.0
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.46.0)
+
+  packages/pages/blog-list:
+    dependencies:
+      next:
+        specifier: 'catalog:'
+        version: 16.1.4(@babel/core@7.28.6)(@playwright/test@1.58.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      utils.core.format:
+        specifier: workspace:*
+        version: link:../../utils/core/format
+    devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.9
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.9)
+      configs.eslint:
+        specifier: workspace:*
+        version: link:../../../configs/eslint
+      configs.typescript:
+        specifier: workspace:*
+        version: link:../../../configs/typescript
+      configs.vitest:
+        specifier: workspace:*
+        version: link:../../../configs/vitest
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.2(jiti@1.21.7)
+      jsdom:
+        specifier: 'catalog:'
+        version: 26.1.0
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.46.0)
+
+  packages/pages/blog-post:
+    dependencies:
+      next:
+        specifier: 'catalog:'
+        version: 16.1.4(@babel/core@7.28.6)(@playwright/test@1.58.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      utils.core.format:
+        specifier: workspace:*
+        version: link:../../utils/core/format
     devDependencies:
       '@testing-library/dom':
         specifier: 'catalog:'
