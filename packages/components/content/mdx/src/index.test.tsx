@@ -34,7 +34,7 @@ describe("MDX Components", () => {
 
     it("renders external link with target blank", () => {
       render(<Anchor href="https://example.com">External</Anchor>);
-      const link = screen.getByRole("link", { name: "External" });
+      const link = screen.getByRole("link", { name: "External (opens in new tab)" });
       expect(link).toHaveAttribute("href", "https://example.com");
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");

@@ -37,10 +37,17 @@ function Anchor({ href, children, ...props }: ComponentPropsWithoutRef<"a">) {
     <a
       href={href}
       className="text-primary underline underline-offset-4 hover:text-primary/80"
-      {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
+      {...(isExternal && {
+        target: "_blank",
+        rel: "noopener noreferrer",
+        "aria-describedby": "external-link-message",
+      })}
       {...props}
     >
       {children}
+      {isExternal && (
+        <span className="sr-only"> (opens in new tab)</span>
+      )}
     </a>
   );
 }

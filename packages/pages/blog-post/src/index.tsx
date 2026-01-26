@@ -22,7 +22,7 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
       <nav aria-label="Breadcrumb" className="mb-8">
         <Link
           href="/blog"
-          className="text-sm text-muted-foreground hover:text-foreground"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground"
         >
           &larr; Back to blog
         </Link>
@@ -32,7 +32,7 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
         <header className="mb-8">
           <time
             dateTime={post.date}
-            className="text-sm text-muted-foreground"
+            className="text-sm font-medium text-muted-foreground"
           >
             {formatDate(post.date)}
           </time>
@@ -41,10 +41,10 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
             {post.description}
           </p>
           {post.tags.length > 0 && (
-            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Tags">
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label={`Tags for ${post.title}`}>
               {post.tags.map((tag) => (
                 <li key={tag}>
-                  <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                  <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/70">
                     {tag}
                   </span>
                 </li>

@@ -36,34 +36,34 @@ export default function BlogListPage({ posts }: BlogListPageProps) {
           {publishedPosts.map((post) => (
             <li key={post.slug}>
               <article>
-                <Link
-                  href={post.permalink}
-                  className="group block"
+                <time
+                  dateTime={post.date}
+                  className="text-sm text-muted-foreground"
                 >
-                  <time
-                    dateTime={post.date}
-                    className="text-sm text-muted-foreground"
+                  {formatDate(post.date)}
+                </time>
+                <h2 className="mt-2 text-2xl font-semibold">
+                  <Link
+                    href={post.permalink}
+                    className="hover:text-primary"
                   >
-                    {formatDate(post.date)}
-                  </time>
-                  <h2 className="mt-2 text-2xl font-semibold group-hover:text-primary">
                     {post.title}
-                  </h2>
-                  <p className="mt-2 text-muted-foreground">
-                    {post.description}
-                  </p>
-                  {post.tags.length > 0 && (
-                    <ul className="mt-4 flex flex-wrap gap-2" aria-label="Tags">
-                      {post.tags.map((tag) => (
-                        <li key={tag}>
-                          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                            {tag}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </Link>
+                  </Link>
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  {post.description}
+                </p>
+                {post.tags.length > 0 && (
+                  <ul className="mt-4 flex flex-wrap gap-2" aria-label={`Tags for ${post.title}`}>
+                    {post.tags.map((tag) => (
+                      <li key={tag}>
+                        <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/70">
+                          {tag}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </article>
             </li>
           ))}
