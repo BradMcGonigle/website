@@ -1,46 +1,16 @@
 import * as runtime from "react/jsx-runtime";
 import type { ComponentPropsWithoutRef, ComponentType } from "react";
 
-function Pre({ children, ...props }: ComponentPropsWithoutRef<"pre">) {
-  return (
-    <pre
-      className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-foreground"
-      {...props}
-    >
-      {children}
-    </pre>
-  );
-}
-
-function Code({ children, ...props }: ComponentPropsWithoutRef<"code">) {
-  return (
-    <code className="font-mono text-foreground" {...props}>
-      {children}
-    </code>
-  );
-}
-
-function Blockquote({ children, ...props }: ComponentPropsWithoutRef<"blockquote">) {
-  return (
-    <blockquote
-      className="border-l-4 border-primary pl-4 text-foreground"
-      {...props}
-    >
-      {children}
-    </blockquote>
-  );
-}
-
+// Only override anchor to add external link handling
+// Let @tailwindcss/typography handle all other styling
 function Anchor({ href, children, ...props }: ComponentPropsWithoutRef<"a">) {
   const isExternal = href?.startsWith("http");
   return (
     <a
       href={href}
-      className="text-primary underline underline-offset-4 hover:text-primary/80"
       {...(isExternal && {
         target: "_blank",
         rel: "noopener noreferrer",
-        "aria-describedby": "external-link-message",
       })}
       {...props}
     >
@@ -53,9 +23,6 @@ function Anchor({ href, children, ...props }: ComponentPropsWithoutRef<"a">) {
 }
 
 const sharedComponents = {
-  pre: Pre,
-  code: Code,
-  blockquote: Blockquote,
   a: Anchor,
 };
 
@@ -81,4 +48,4 @@ export function MDXContent({ code, components }: MDXContentProps) {
 
 export const mdxComponents = sharedComponents;
 
-export { Pre, Code, Blockquote, Anchor };
+export { Anchor };
