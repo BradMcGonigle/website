@@ -1,0 +1,29 @@
+---
+version: "0.4.0"
+date: 2026-01-26
+title: Velite Content Management
+description: Added type-safe MDX content collections with Velite
+tags:
+  - feature
+---
+
+Integrated Velite for managing MDX content with full TypeScript support.
+
+## Content Collections
+
+- **Blog Posts**: MDX-powered blog with frontmatter for title, description, date, and tags
+- **Projects**: Showcase for personal projects with tech stack and links
+- **Changelog**: Track site updates and version history
+
+## Technical Implementation
+
+- Configured Velite with Turbopack for fast development builds
+- Set up `#content` path alias for type-safe imports
+- Added MDX support with rehype and remark plugin extensibility
+- Excluded Velite output from ESLint for cleaner development
+
+## Developer Experience
+
+- Full TypeScript inference for content schemas
+- Hot reloading during content development
+- Automatic slug and permalink generation

@@ -1,4 +1,5 @@
 import { defineCollection, defineConfig, s } from "velite";
+import type { UserConfig } from "velite";
 
 const blog = defineCollection({
   name: "Post",
@@ -41,7 +42,29 @@ const projects = defineCollection({
     })),
 });
 
-export default defineConfig({
+const changelog = defineCollection({
+  name: "ChangelogEntry",
+  pattern: "changelog/**/*.mdx",
+  schema: s
+    .object({
+      version: s.string(),
+      date: s.isodate(),
+      title: s.string().max(99),
+      description: s.string().max(999).optional(),
+      breaking: s.boolean().default(false),
+      tags: s
+        .array(s.enum(["feature", "fix", "improvement", "breaking", "docs"]))
+        .default([]),
+      content: s.mdx(),
+    })
+    .transform((data, { meta }) => ({
+      ...data,
+      slug: meta.basename?.replace(/\.mdx$/, "") ?? "",
+      permalink: `/changelog/${meta.basename?.replace(/\.mdx$/, "") ?? ""}`,
+    })),
+});
+
+const config = {
   root: "content",
   output: {
     data: ".velite",
@@ -50,9 +73,11 @@ export default defineConfig({
     name: "[name]-[hash:6].[ext]",
     clean: true,
   },
-  collections: { blog, projects },
+  collections: { blog, projects, changelog },
   mdx: {
     rehypePlugins: [],
     remarkPlugins: [],
   },
-});
+} satisfies UserConfig;
+
+export default defineConfig(config);

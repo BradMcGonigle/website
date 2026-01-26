@@ -1,0 +1,30 @@
+---
+version: "0.2.0"
+date: 2026-01-25
+title: Testing Infrastructure
+description: Added comprehensive testing with Vitest and Playwright
+tags:
+  - feature
+  - improvement
+---
+
+Established a robust testing foundation with unit testing and end-to-end testing capabilities.
+
+## Unit Testing with Vitest
+
+- Configured Vitest with React Testing Library for component testing
+- Created shared `configs.vitest` package for consistent test configuration
+- Added tests for all page components and utilities
+- Integrated with CI pipeline for automated test runs
+
+## E2E Testing with Playwright
+
+- Set up Playwright for end-to-end browser testing
+- Configured cross-browser testing (Chromium, Firefox, WebKit)
+- Added accessibility testing with skip-to-content link verification
+- Created test fixtures and page object patterns
+
+## CI Integration
+
+- Added test job to GitHub Actions workflow
+- Tests run automatically on all pull requests
