@@ -15,11 +15,11 @@ export interface ChangelogPageProps {
 }
 
 const tagColors: Record<ChangelogEntry["tags"][number], string> = {
-  feature: "bg-green-100 text-green-800",
-  fix: "bg-red-100 text-red-800",
-  improvement: "bg-blue-100 text-blue-800",
-  breaking: "bg-orange-100 text-orange-800",
-  docs: "bg-purple-100 text-purple-800",
+  feature: "bg-green-500/15 text-green-700 dark:text-green-400",
+  fix: "bg-red-500/15 text-red-700 dark:text-red-400",
+  improvement: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
+  breaking: "bg-orange-500/15 text-orange-700 dark:text-orange-400",
+  docs: "bg-purple-500/15 text-purple-700 dark:text-purple-400",
 };
 
 function formatDate(dateString: string): string {

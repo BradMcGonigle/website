@@ -22,7 +22,7 @@ export default function BlogPostPage({ post, children }: BlogPostPageProps) {
       <nav aria-label="Breadcrumb" className="mb-8">
         <Link
           href="/blog"
-          className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          className="rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           &larr; Back to blog
         </Link>
