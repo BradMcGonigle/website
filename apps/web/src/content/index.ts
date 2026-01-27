@@ -47,7 +47,9 @@ export interface Link {
   url: string;
   image?: string;
   date: string;
+  category: "article" | "tool" | "video" | "podcast" | "resource" | "other";
   tags: string[];
+  featured: boolean;
   slug: string;
 }
 

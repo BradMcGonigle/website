@@ -76,7 +76,11 @@ const links = defineCollection({
       url: s.string().url(),
       image: s.string().optional(),
       date: s.isodate(),
+      category: s
+        .enum(["article", "tool", "video", "podcast", "resource", "other"])
+        .default("other"),
       tags: s.array(s.string()).default([]),
+      featured: s.boolean().default(false),
     })
     .transform((data, { meta }) => ({
       ...data,
