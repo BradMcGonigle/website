@@ -66,6 +66,24 @@ const changelog = defineCollection({
     })),
 });
 
+const links = defineCollection({
+  name: "Link",
+  pattern: "links/**/*.mdx",
+  schema: s
+    .object({
+      title: s.string().max(199),
+      description: s.string().max(999).optional(),
+      url: s.string().url(),
+      image: s.string().optional(),
+      date: s.isodate(),
+      tags: s.array(s.string()).default([]),
+    })
+    .transform((data, { meta }) => ({
+      ...data,
+      slug: meta.basename?.replace(/\.mdx$/, "") ?? "",
+    })),
+});
+
 const prettyCodeOptions: Options = {
   // Use dual themes for light/dark mode support
   theme: {
@@ -87,7 +105,7 @@ const config = {
     name: "[name]-[hash:6].[ext]",
     clean: true,
   },
-  collections: { blog, projects, changelog },
+  collections: { blog, projects, changelog, links },
   mdx: {
     rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
     remarkPlugins: [],

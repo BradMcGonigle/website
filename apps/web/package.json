@@ -25,6 +25,7 @@
     "pages.blog-post": "workspace:*",
     "pages.changelog": "workspace:*",
     "pages.home": "workspace:*",
+    "pages.links-list": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "rehype-pretty-code": "^0.14.1",

@@ -41,10 +41,21 @@ export interface ChangelogEntry {
   permalink: string;
 }
 
+export interface Link {
+  title: string;
+  description?: string;
+  url: string;
+  image?: string;
+  date: string;
+  tags: string[];
+  slug: string;
+}
+
 interface VeliteContent {
   blog: Post[];
   projects: Project[];
   changelog: ChangelogEntry[];
+  links: Link[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
@@ -53,3 +64,4 @@ const veliteContent: VeliteContent = require("../../.velite");
 export const blog: Post[] = veliteContent.blog;
 export const projects: Project[] = veliteContent.projects;
 export const changelog: ChangelogEntry[] = veliteContent.changelog;
+export const links: Link[] = veliteContent.links;

@@ -1,43 +1,39 @@
 ---
 version: "0.5.0"
-date: 2026-01-26
-title: Blog Infrastructure
-description: Added blog pages with MDX content, syntax highlighting, and improved typography
+date: 2026-01-27
+title: Links Collection & Bookmarklet
+description: Added a Links page to share interesting articles and resources with a bookmarklet for easy saving
 tags:
   - feature
 ---
 
-Launched the blog section with full MDX support and migrated existing content.
+Added a new **Links** section for sharing interesting articles, tools, and resources discovered around the web.
 
-## Blog Pages
+## Links Page
 
-Created two new page packages following the established architecture:
+- New `/links` route displaying saved links in a card grid layout
+- Each link shows title, description, image (if available), date, and tags
+- Links open in new tabs and are sorted by date (newest first)
 
-- **pages.blog-list** - Displays all blog posts with title, date, and description
-- **pages.blog-post** - Renders individual posts with MDX content support
+## Save Links API
 
-## Content Migration
+Created an API endpoint at `/api/links` that:
 
-Migrated 7 blog posts covering React, CI/CD, and mobile development:
+- Accepts a URL and optional tags
+- Fetches the page and extracts metadata (title, description, OG image)
+- Generates an MDX file and commits it to GitHub automatically
+- Protected with an API key for security
 
-- GitHub Actions for Continuous Deployment
-- Deploying to Netlify via CircleCI
-- Understanding React Fragments
-- Introducing React NHL Logos
-- Fastlane Mobile App Builds
-- Drafts for Gatsby
-- Using Bulma with React
+## Bookmarklet Tool
 
-## Syntax Highlighting
+Added a bookmarklet in `tools/link-bookmarklet/` for quickly saving links:
 
-Integrated [rehype-pretty-code](https://rehype-pretty-code.netlify.app/) with [Shiki](https://shiki.style/) for code block syntax highlighting:
+- **Desktop**: One-click bookmarklet that sends the current page to the API
+- **iOS**: Instructions for creating a Shortcut that appears in the Share Sheet
+- Simple HTML setup page for generating personalized bookmarklets
 
-- Dual theme support for light and dark modes
-- Language-aware highlighting
-- Clean, minimal code block styling
+## Technical Details
 
-## Typography & Accessibility
-
-- Configured [@tailwindcss/typography](https://tailwindcss.com/docs/typography-plugin) for consistent prose styling
-- Improved color contrast to meet WCAG AA compliance
-- Integrated typography styles with the design system
+- New `links` Velite collection with schema for title, description, url, image, date, and tags
+- New `pages.links-list` package for the links page component
+- API route uses GitHub API to create content files directly
