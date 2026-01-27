@@ -33,8 +33,7 @@ test.describe("Mobile Navigation", () => {
   }) => {
     await page.goto("/");
 
-    const menuButton = page.getByRole("button", { name: "Open menu" });
-    await menuButton.click();
+    await page.getByRole("button", { name: "Open menu" }).click();
 
     // Mobile navigation should be visible
     const mobileNav = page.getByRole("navigation", {
@@ -42,8 +41,9 @@ test.describe("Mobile Navigation", () => {
     });
     await expect(mobileNav).toBeVisible();
 
-    // Button should now show close state
-    await expect(menuButton).toHaveAttribute("aria-expanded", "true");
+    // Button should now show close state (name changed to "Close menu")
+    const closeButton = page.getByRole("button", { name: "Close menu" });
+    await expect(closeButton).toHaveAttribute("aria-expanded", "true");
   });
 
   test("closes mobile menu when close button is clicked", async ({ page }) => {
