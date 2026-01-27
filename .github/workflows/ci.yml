@@ -216,8 +216,25 @@ jobs:
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 7
+
+      - name: Add Playwright report link to summary
+        if: always()
+        run: |
+          echo "## Playwright E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "apps/web/playwright-report" ]; then
+            echo "📊 **[Download Playwright Report](../actions/runs/${{ github.run_id }}/artifacts)**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "To view the report locally:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "# Download and extract the artifact, then:" >> $GITHUB_STEP_SUMMARY
+            echo "npx playwright show-report playwright-report" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No Playwright report generated." >> $GITHUB_STEP_SUMMARY
+          fi

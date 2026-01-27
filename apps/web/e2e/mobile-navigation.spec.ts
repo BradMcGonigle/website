@@ -23,7 +23,8 @@ test.describe("Mobile Navigation", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    const menuButton = page.getByRole("button", { name: "Open menu" });
+    // Use CSS locator since getByRole excludes hidden elements
+    const menuButton = page.locator("button", { hasText: "Open menu" });
     await expect(menuButton).toBeHidden();
   });
 
@@ -36,7 +37,9 @@ test.describe("Mobile Navigation", () => {
     await menuButton.click();
 
     // Mobile navigation should be visible
-    const mobileNav = page.getByRole("navigation", { name: "Mobile navigation" });
+    const mobileNav = page.getByRole("navigation", {
+      name: "Mobile navigation",
+    });
     await expect(mobileNav).toBeVisible();
 
     // Button should now show close state
@@ -54,9 +57,10 @@ test.describe("Mobile Navigation", () => {
 
     // Close the menu
     await page.getByRole("button", { name: "Close menu" }).click();
-    await expect(
-      page.getByRole("navigation", { name: "Mobile navigation" })
-    ).toBeHidden();
+
+    // Use CSS locator to check hidden state (element removed from DOM)
+    const mobileNav = page.locator('nav[aria-label="Mobile navigation"]');
+    await expect(mobileNav).toBeHidden();
   });
 
   test("can navigate using mobile menu", async ({ page }) => {
@@ -88,16 +92,16 @@ test.describe("Mobile Navigation", () => {
       .getByRole("link", { name: "About" })
       .click();
 
-    // After navigation, mobile menu should be closed
-    await expect(
-      page.getByRole("navigation", { name: "Mobile navigation" })
-    ).toBeHidden();
+    // After navigation, mobile menu should be closed (removed from DOM)
+    const mobileNav = page.locator('nav[aria-label="Mobile navigation"]');
+    await expect(mobileNav).toBeHidden();
   });
 
   test("desktop navigation is hidden on mobile", async ({ page }) => {
     await page.goto("/");
 
-    const desktopNav = page.getByRole("navigation", { name: "Main navigation" });
+    // Use CSS locator since getByRole excludes hidden elements
+    const desktopNav = page.locator('nav[aria-label="Main navigation"]');
     await expect(desktopNav).toBeHidden();
   });
 });
