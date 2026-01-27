@@ -45,7 +45,7 @@ export default function BlogListPage({ posts }: BlogListPageProps) {
                 <h2 className="mt-2 text-2xl font-semibold">
                   <Link
                     href={post.permalink}
-                    className="hover:text-primary"
+                    className="rounded-sm hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     {post.title}
                   </Link>
