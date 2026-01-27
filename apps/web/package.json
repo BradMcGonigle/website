@@ -17,6 +17,7 @@
     "components.layout.footer": "workspace:*",
     "components.layout.header": "workspace:*",
     "geist": "catalog:",
+    "lucide-react": "^0.563.0",
     "next": "catalog:",
     "next-themes": "^0.4.6",
     "pages.about": "workspace:*",
