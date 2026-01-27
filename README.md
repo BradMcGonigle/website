@@ -17,10 +17,16 @@ website/
 │   └── vitest/                       # Shared Vitest configs (base, React)
 └── packages/
     ├── components/
-    │   └── design-system/
-    │       └── button/               # components.design-system.button
+    │   ├── design-system/
+    │   │   └── button/               # components.design-system.button
+    │   └── layout/
+    │       ├── header/               # components.layout.header
+    │       └── footer/               # components.layout.footer
     ├── pages/
-    │   └── home/                     # pages.home
+    │   ├── home/                     # pages.home
+    │   ├── about/                    # pages.about
+    │   ├── blog-list/                # pages.blog-list
+    │   └── blog-post/                # pages.blog-post
     └── utils/
         └── core/
             ├── cn/                   # utils.core.cn
@@ -108,8 +114,10 @@ pnpm format
 ### Design System
 
 - CSS variables for light/dark mode theming
+- Theme toggle with system preference detection via next-themes
 - Consistent border radius tokens
 - shadcn/ui compatible color scheme
+- lucide-react icons throughout the UI
 
 ## 📝 Content Management
 
@@ -261,10 +269,11 @@ GitHub Actions workflow runs on all PRs to `main`:
 
 - ✅ ESLint checks
 - ✅ TypeScript type checking
-- ✅ Tests (Vitest)
+- ✅ Unit tests (Vitest)
+- ✅ E2E tests (Playwright)
 - ✅ Build verification
 
-All checks must pass before merging.
+Playwright HTML reports are attached to CI summaries for easy debugging. All checks must pass before merging.
 
 ## 📚 Documentation
 
@@ -301,23 +310,25 @@ Centralized configs (`configs/*`) ensure:
 
 ## 🧪 Testing
 
-Tests use [Vitest](https://vitest.dev/) with shared configs from `configs/vitest/`.
+### Unit Tests
+
+Unit tests use [Vitest](https://vitest.dev/) with shared configs from `configs/vitest/`.
 
 ```bash
-# Run all tests
+# Run all unit tests
 pnpm test
 
 # Run tests in watch mode (per-package)
 cd packages/utils/core/cn && pnpm test:watch
 ```
 
-### Test Structure
+#### Test Structure
 
 Each testable package includes:
 - `vitest.config.ts` - Extends shared config
 - `src/*.test.ts(x)` - Test files colocated with source
 
-### Shared Configs
+#### Shared Configs
 
 | Config | Environment | Use Case |
 |--------|-------------|----------|
@@ -326,10 +337,26 @@ Each testable package includes:
 
 React component tests use `@testing-library/react` for accessible, behavior-focused testing.
 
+### E2E Tests
+
+End-to-end tests use [Playwright](https://playwright.dev/) for cross-browser testing.
+
+```bash
+# Run E2E tests
+pnpm --filter web e2e
+
+# Run E2E tests with UI
+pnpm --filter web e2e --ui
+```
+
+E2E tests are located in `apps/web/e2e/` and cover:
+- Theme toggle functionality
+- Mobile navigation
+- Accessibility (skip-to-content links)
+
 ## 🔮 Future Plans
 
 - Set up shadcn/ui components
-- Add more page packages (about, contact, etc.)
-- Create blog listing and detail pages using Velite content
+- Add contact page
 - Build project portfolio pages
 - Explore other frameworks (Vue, Svelte) in component packages

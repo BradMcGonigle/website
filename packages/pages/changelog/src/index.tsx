@@ -30,10 +30,24 @@ function formatDate(dateString: string): string {
   });
 }
 
+function compareVersions(a: string, b: string): number {
+  const partsA = a.split(".").map(Number);
+  const partsB = b.split(".").map(Number);
+  for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+    const numA = partsA[i] ?? 0;
+    const numB = partsB[i] ?? 0;
+    if (numA !== numB) return numB - numA;
+  }
+  return 0;
+}
+
 export default function ChangelogPage({ entries }: ChangelogPageProps) {
-  const sortedEntries = [...entries].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedEntries = [...entries].sort((a, b) => {
+    const dateCompare =
+      new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    return compareVersions(a.version, b.version);
+  });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
