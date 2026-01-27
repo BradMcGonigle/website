@@ -13,18 +13,24 @@
     "clean": "rm -rf .next .turbo node_modules e2e-results playwright-report"
   },
   "dependencies": {
+    "components.content.mdx": "workspace:*",
     "components.layout.footer": "workspace:*",
     "components.layout.header": "workspace:*",
     "geist": "catalog:",
     "next": "catalog:",
     "pages.about": "workspace:*",
+    "pages.blog-list": "workspace:*",
+    "pages.blog-post": "workspace:*",
     "pages.changelog": "workspace:*",
     "pages.home": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "rehype-pretty-code": "^0.14.1",
+    "shiki": "^3.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
+    "@tailwindcss/typography": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

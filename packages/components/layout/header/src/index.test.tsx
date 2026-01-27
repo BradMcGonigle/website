@@ -42,6 +42,10 @@ describe("Header", () => {
       "href",
       "/about"
     );
+    expect(screen.getByRole("link", { name: "Blog" })).toHaveAttribute(
+      "href",
+      "/blog"
+    );
     expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
       "href",
       "/changelog"
@@ -53,6 +57,6 @@ describe("Header", () => {
     const list = screen.getByRole("list");
     expect(list).toBeInTheDocument();
     const listItems = screen.getAllByRole("listitem");
-    expect(listItems).toHaveLength(3);
+    expect(listItems).toHaveLength(4);
   });
 });
