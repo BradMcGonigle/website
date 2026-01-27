@@ -80,21 +80,19 @@
     @apply px-4;
   }
 
-  /* Light/dark theme switching for code blocks */
-  [data-theme="dark"] {
-    display: none;
+  /* Shiki dual theme - map CSS variables to color property */
+  /* Light mode (default): use --shiki-light variables */
+  [data-theme*="light"],
+  [data-theme*="light"] span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
   }
 
-  [data-theme="light"] {
-    display: inline;
-  }
-
-  .dark [data-theme="light"] {
-    display: none;
-  }
-
-  .dark [data-theme="dark"] {
-    display: inline;
+  /* Dark mode: use --shiki-dark variables */
+  .dark [data-theme*="dark"],
+  .dark [data-theme*="dark"] span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
   }
 
   /* Code block background colors from GitHub themes */
