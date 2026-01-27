@@ -13,6 +13,7 @@
     "clean": "rm -rf .next .turbo node_modules e2e-results playwright-report"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^131.0.0",
     "components.content.mdx": "workspace:*",
     "components.layout.footer": "workspace:*",
     "components.layout.header": "workspace:*",
@@ -26,6 +27,7 @@
     "pages.changelog": "workspace:*",
     "pages.home": "workspace:*",
     "pages.links-list": "workspace:*",
+    "puppeteer-core": "^24.0.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "rehype-pretty-code": "^0.14.1",

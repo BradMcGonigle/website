@@ -1,14 +1,23 @@
 # Save Link Bookmarklet
 
-A simple tool for quickly saving interesting links to your website's `/links` page.
+A tool for quickly saving interesting links to your website's `/links` page with full control over metadata and images.
+
+## Features
+
+- **Preview & Edit**: See and modify title, description, and tags before saving
+- **Image Selection**: Choose from all images found on the page
+- **Screenshot Option**: Take a page screenshot if no suitable images exist
+- **Local Image Storage**: Images are saved to your repo (no hotlinking)
+- **Works Everywhere**: Desktop bookmarklet + iOS Shortcut support
 
 ## How It Works
 
-1. You click the bookmarklet (or use the iOS Shortcut) while viewing any webpage
-2. The bookmarklet sends the URL to your website's API
-3. The API fetches the page and extracts metadata (title, description, OG image)
-4. The API creates a new MDX file in your content folder via the GitHub API
-5. On the next build/deploy, the link appears on your `/links` page
+1. Click the bookmarklet (or use iOS Shortcut) on any page
+2. A popup opens with the Save Link form
+3. Edit the title, description, and tags as needed
+4. Select an image from the page, take a screenshot, or choose no image
+5. Click Save - the link and image are committed to your GitHub repo
+6. On the next deploy, the link appears on your `/links` page
 
 ## Setup
 
@@ -17,7 +26,7 @@ A simple tool for quickly saving interesting links to your website's `/links` pa
 Add these to your deployment environment (Vercel, Netlify, etc.):
 
 ```bash
-# Secret key for authenticating bookmarklet requests
+# Secret key for authenticating requests
 LINKS_API_KEY=generate-a-random-string-here
 
 # GitHub Personal Access Token with 'repo' scope
@@ -32,8 +41,8 @@ GITHUB_BRANCH=main
 
 ### 2. Desktop Bookmarklet
 
-1. Open `index.html` in a browser
-2. Enter your API URL and API key
+1. Open `index.html` in a browser (or host it somewhere)
+2. Enter your site URL and API key
 3. Click "Generate Bookmarklet"
 4. Drag the "Save Link" button to your bookmarks bar
 
@@ -43,45 +52,62 @@ Create a Shortcut with these actions:
 
 1. **Receive input from Share Sheet** (accept URLs)
 2. **Get URLs from Input**
-3. **Get Contents of URL**
-   - URL: `https://yoursite.com/api/links`
-   - Method: POST
-   - Headers:
-     - `x-api-key`: your API key
-     - `Content-Type`: application/json
-   - Request Body: JSON
-     - `url`: Shortcut Input
-4. **Show Notification**: "Link saved!"
+3. **Open URLs**
+   - URL: `https://yoursite.com/links/new?url=[Shortcut Input]&key=YOUR_API_KEY`
 
 Enable "Show in Share Sheet" in the shortcut settings.
 
 ## Usage
 
 ### Desktop
-Click the bookmarklet while on any page. You'll see a brief notification confirming the link was saved.
+
+1. Navigate to any interesting page
+2. Click the "Save Link" bookmarklet
+3. A popup opens with the page preview
+4. Edit metadata and select an image
+5. Click "Save Link"
 
 ### iOS
-1. Tap the Share button on any page
+
+1. On any page, tap the Share button
 2. Select your "Save Link" shortcut
-3. Done!
+3. Safari opens with the Save Link form
+4. Edit and select image
+5. Tap "Save Link"
 
-## Security Notes
+## Technical Details
 
-- The API key is embedded in the bookmarklet/shortcut, so keep it private
-- Consider rotating the API key periodically
-- The GitHub token should have minimal required permissions (just `repo` scope)
+### API Endpoints
+
+- `GET /api/links/preview?url=...` - Fetches page metadata and all images
+- `GET /api/links/screenshot?url=...` - Takes a page screenshot (uses Puppeteer)
+- `POST /api/links` - Saves the link (downloads image, commits to GitHub)
+
+### Image Handling
+
+When you select an image:
+1. The API downloads the image from the source URL (or decodes base64 for screenshots)
+2. Saves it to `public/images/links/` in your repo via GitHub API
+3. References the local path in the MDX frontmatter
+
+### Security
+
+- API key required for all save operations
+- Key can be passed via URL param (stored in sessionStorage) or request body
+- The `/links/new` page is marked as `noindex, nofollow`
 
 ## Customization
 
-### Adding Tags
+### Filtering Images
 
-The API supports optional tags:
+The preview API filters out common non-content images:
+- Favicons and icons
+- Tracking pixels
+- SVGs (usually icons)
+- Images with "logo" + "small" in the path
 
-```json
-{
-  "url": "https://example.com",
-  "tags": ["development", "tools"]
-}
-```
+You can modify `apps/web/src/app/api/links/preview/route.ts` to adjust filtering.
 
-You could modify the bookmarklet to prompt for tags, or create multiple shortcuts for different categories.
+### Screenshot Settings
+
+Screenshots are taken at 1200x630 resolution (standard OG image size). Modify `apps/web/src/app/api/links/screenshot/route.ts` to change dimensions or quality.

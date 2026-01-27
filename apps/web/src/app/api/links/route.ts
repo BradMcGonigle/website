@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-interface LinkMetadata {
-  title: string;
-  description: string;
-  image: string;
+interface SaveLinkRequest {
   url: string;
+  title: string;
+  description?: string;
+  image?: string | null; // URL or base64 data URI
+  tags?: string[];
+  apiKey?: string; // Can be in body or header
 }
 
 function slugify(text: string): string {
@@ -15,89 +17,49 @@ function slugify(text: string): string {
     .slice(0, 60);
 }
 
-async function fetchMetadata(url: string): Promise<LinkMetadata> {
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (compatible; LinkBot/1.0; +https://bradmcgonigle.com)",
-    },
-  });
+async function downloadImage(
+  imageSource: string
+): Promise<{ data: string; extension: string } | null> {
+  try {
+    // Handle base64 data URIs (from screenshots)
+    if (imageSource.startsWith("data:")) {
+      const match = imageSource.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (match && match[1] && match[2]) {
+        return { data: match[2], extension: match[1] };
+      }
+      return null;
+    }
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch URL: ${response.status}`);
+    // Download image from URL
+    const response = await fetch(imageSource, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to download image: ${response.status}`);
+      return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const extension = contentType.split("/")[1]?.split(";")[0] || "jpg";
+    const arrayBuffer = await response.arrayBuffer();
+    const data = Buffer.from(arrayBuffer).toString("base64");
+
+    return { data, extension };
+  } catch (error) {
+    console.error("Error downloading image:", error);
+    return null;
   }
-
-  const html = await response.text();
-
-  // Extract title
-  const titleMatch =
-    html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]*)"[^>]*>/i) ||
-    html.match(/<meta[^>]*content="([^"]*)"[^>]*property="og:title"[^>]*>/i) ||
-    html.match(/<title[^>]*>([^<]*)<\/title>/i);
-  const title = titleMatch?.[1]?.trim() || new URL(url).hostname;
-
-  // Extract description
-  const descMatch =
-    html.match(
-      /<meta[^>]*property="og:description"[^>]*content="([^"]*)"[^>]*>/i
-    ) ||
-    html.match(
-      /<meta[^>]*content="([^"]*)"[^>]*property="og:description"[^>]*>/i
-    ) ||
-    html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i) ||
-    html.match(/<meta[^>]*content="([^"]*)"[^>]*name="description"[^>]*>/i);
-  const description = descMatch?.[1]?.trim() || "";
-
-  // Extract OG image
-  const imageMatch =
-    html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/i) ||
-    html.match(/<meta[^>]*content="([^"]*)"[^>]*property="og:image"[^>]*>/i);
-  let image = imageMatch?.[1]?.trim() || "";
-
-  // Make relative URLs absolute
-  if (image && !image.startsWith("http")) {
-    const baseUrl = new URL(url);
-    image = new URL(image, baseUrl.origin).toString();
-  }
-
-  return { title, description, image, url };
-}
-
-function generateMdxContent(
-  metadata: LinkMetadata,
-  tags: string[]
-): string {
-  const date = new Date().toISOString().split("T")[0];
-  const lines = [
-    "---",
-    `title: "${metadata.title.replace(/"/g, '\\"')}"`,
-  ];
-
-  if (metadata.description) {
-    lines.push(`description: "${metadata.description.replace(/"/g, '\\"')}"`);
-  }
-
-  lines.push(`url: ${metadata.url}`);
-
-  if (metadata.image) {
-    lines.push(`image: ${metadata.image}`);
-  }
-
-  lines.push(`date: ${date}`);
-
-  if (tags.length > 0) {
-    lines.push("tags:");
-    tags.forEach((tag) => lines.push(`  - ${tag}`));
-  }
-
-  lines.push("---", "");
-
-  return lines.join("\n");
 }
 
 async function createGitHubFile(
-  filename: string,
-  content: string
+  path: string,
+  content: string,
+  message: string,
+  isBase64 = false
 ): Promise<{ success: boolean; url?: string; error?: string }> {
   const token = process.env.GITHUB_TOKEN;
   const repo = process.env.GITHUB_REPO || "BradMcGonigle/website";
@@ -107,7 +69,6 @@ async function createGitHubFile(
     return { success: false, error: "GitHub token not configured" };
   }
 
-  const path = `apps/web/content/links/${filename}`;
   const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
 
   const response = await fetch(apiUrl, {
@@ -118,8 +79,8 @@ async function createGitHubFile(
       Accept: "application/vnd.github.v3+json",
     },
     body: JSON.stringify({
-      message: `Add link: ${filename.replace(".mdx", "")}`,
-      content: Buffer.from(content).toString("base64"),
+      message,
+      content: isBase64 ? content : Buffer.from(content).toString("base64"),
       branch,
     }),
   });
@@ -134,9 +95,43 @@ async function createGitHubFile(
   return url ? { success: true, url } : { success: true };
 }
 
+function generateMdxContent(
+  url: string,
+  title: string,
+  description: string,
+  imagePath: string | null,
+  tags: string[]
+): string {
+  const date = new Date().toISOString().split("T")[0];
+  const lines = ["---", `title: "${title.replace(/"/g, '\\"')}"`];
+
+  if (description) {
+    lines.push(`description: "${description.replace(/"/g, '\\"')}"`);
+  }
+
+  lines.push(`url: ${url}`);
+
+  if (imagePath) {
+    lines.push(`image: ${imagePath}`);
+  }
+
+  lines.push(`date: ${date}`);
+
+  if (tags.length > 0) {
+    lines.push("tags:");
+    tags.forEach((tag) => lines.push(`  - ${tag}`));
+  }
+
+  lines.push("---", "");
+
+  return lines.join("\n");
+}
+
 export async function POST(request: NextRequest) {
-  // Verify API key
-  const apiKey = request.headers.get("x-api-key");
+  // Verify API key - accept from header or body
+  const headerApiKey = request.headers.get("x-api-key");
+  const body = (await request.json()) as SaveLinkRequest;
+  const apiKey = headerApiKey || body.apiKey;
   const expectedKey = process.env.LINKS_API_KEY;
 
   if (!expectedKey) {
@@ -151,11 +146,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as { url?: string; tags?: string[] };
-    const { url, tags = [] } = body;
+    const { url, title, description = "", image, tags = [] } = body;
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    }
+
+    if (!title) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
     // Validate URL
@@ -165,19 +163,51 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    // Fetch metadata
-    const metadata = await fetchMetadata(url);
-
-    // Generate filename
-    const slug = slugify(metadata.title);
+    // Generate slug and timestamp for unique filenames
+    const slug = slugify(title);
     const timestamp = Date.now();
-    const filename = `${slug}-${timestamp}.mdx`;
+    let imagePath: string | null = null;
 
-    // Generate MDX content
-    const content = generateMdxContent(metadata, tags);
+    // Process image if provided
+    if (image) {
+      const imageData = await downloadImage(image);
+      if (imageData) {
+        const imageFilename = `${slug}-${timestamp}.${imageData.extension}`;
+        const imageGitPath = `apps/web/public/images/links/${imageFilename}`;
 
-    // Create file on GitHub
-    const result = await createGitHubFile(filename, content);
+        const imageResult = await createGitHubFile(
+          imageGitPath,
+          imageData.data,
+          `Add image for link: ${slug}`,
+          true // Already base64 encoded
+        );
+
+        if (imageResult.success) {
+          imagePath = `/images/links/${imageFilename}`;
+        } else {
+          console.error("Failed to upload image:", imageResult.error);
+          // Continue without image rather than failing entirely
+        }
+      }
+    }
+
+    // Generate MDX content with local image path
+    const mdxContent = generateMdxContent(
+      url,
+      title,
+      description,
+      imagePath,
+      tags
+    );
+    const mdxFilename = `${slug}-${timestamp}.mdx`;
+    const mdxPath = `apps/web/content/links/${mdxFilename}`;
+
+    // Create MDX file on GitHub
+    const result = await createGitHubFile(
+      mdxPath,
+      mdxContent,
+      `Add link: ${title}`
+    );
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
@@ -186,8 +216,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Link saved successfully",
-      metadata,
-      filename,
+      filename: mdxFilename,
+      imagePath,
       githubUrl: result.url,
     });
   } catch (error) {
@@ -201,11 +231,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    message: "Links API - POST a URL to save a link",
+    message: "Links API - POST to save a link",
     usage: {
       method: "POST",
       headers: { "x-api-key": "your-api-key" },
-      body: { url: "https://example.com", tags: ["optional", "tags"] },
+      body: {
+        url: "https://example.com",
+        title: "Page Title",
+        description: "Optional description",
+        image: "https://example.com/image.jpg or data:image/jpeg;base64,...",
+        tags: ["optional", "tags"],
+      },
     },
   });
 }

@@ -1,0 +1,46 @@
+---
+version: "0.7.0"
+date: 2026-01-27
+title: Links Collection & Bookmarklet
+description: Added a Links page to share interesting articles and resources with an interactive bookmarklet for easy saving
+tags:
+  - feature
+---
+
+Added a new **Links** section for sharing interesting articles, tools, and resources discovered around the web.
+
+## Links Page
+
+- New `/links` route displaying saved links in a card grid layout
+- Each link shows title, description, image (if available), date, and tags
+- Links open in new tabs and are sorted by date (newest first)
+
+## Interactive Save Link Page
+
+New `/links/new` page for curating links with full control:
+
+- **Preview & Edit**: Modify title, description, and tags before saving
+- **Image Selection**: Browse all images found on the page
+- **Screenshot Option**: Take a page screenshot using Puppeteer if no good images exist
+- **Local Storage**: Images are downloaded and saved to your repo (no hotlinking)
+
+## API Endpoints
+
+- `GET /api/links/preview` - Fetches page metadata and extracts all images
+- `GET /api/links/screenshot` - Takes a page screenshot using headless Chrome
+- `POST /api/links` - Downloads selected image and commits both image + MDX to GitHub
+
+## Bookmarklet Tool
+
+Updated bookmarklet in `tools/link-bookmarklet/`:
+
+- **Desktop**: Opens the Save Link page in a popup for quick curation
+- **iOS**: Simple Shortcut that opens Safari to the Save Link page
+- HTML setup page for generating personalized bookmarklets
+
+## Technical Details
+
+- New `links` Velite collection with schema for title, description, url, image, date, and tags
+- New `pages.links-list` package for the links page component
+- Puppeteer with `@sparticuz/chromium` for serverless screenshot capability
+- Images stored in `public/images/links/` for reliable long-term hosting

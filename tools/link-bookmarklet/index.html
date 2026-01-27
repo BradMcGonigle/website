@@ -171,28 +171,77 @@
       .warning strong {
         color: #f59e0b;
       }
+
+      .feature-list {
+        display: grid;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        color: var(--muted);
+      }
+
+      .feature-item svg {
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+        color: var(--success);
+      }
     </style>
   </head>
   <body>
     <h1>Save Link Bookmarklet</h1>
     <p class="subtitle">
-      Quickly save interesting links to your website from any browser.
+      Save interesting links to your website with image selection and metadata editing.
     </p>
+
+    <section>
+      <h2>How It Works</h2>
+      <div class="feature-list">
+        <div class="feature-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Click the bookmarklet on any page to open the Save Link form</span>
+        </div>
+        <div class="feature-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Preview and edit the title, description, and tags</span>
+        </div>
+        <div class="feature-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Choose from all images on the page, or take a screenshot</span>
+        </div>
+        <div class="feature-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Images are saved to your repo (no hotlinking)</span>
+        </div>
+      </div>
+    </section>
 
     <section>
       <h2>Configuration</h2>
       <p>
-        Enter your API URL and API key below, then drag the bookmarklet to your
+        Enter your site URL and API key below, then drag the bookmarklet to your
         bookmarks bar.
       </p>
 
       <div class="config-section">
-        <label for="apiUrl">API URL</label>
+        <label for="siteUrl">Site URL</label>
         <input
           type="url"
-          id="apiUrl"
-          value="https://www.bradmcgonigle.com/api/links"
-          placeholder="https://yoursite.com/api/links"
+          id="siteUrl"
+          value="https://www.bradmcgonigle.com"
+          placeholder="https://yoursite.com"
         />
 
         <label for="apiKey">API Key</label>
@@ -216,7 +265,7 @@
 
       <div class="warning">
         <strong>Note:</strong> Keep your API key secret! Anyone with the
-        bookmarklet can save links to your site.
+        bookmarklet URL can save links to your site.
       </div>
     </section>
 
@@ -235,17 +284,11 @@
         </li>
         <li>Add action: <code>Get URLs from Input</code></li>
         <li>
-          Add action: <code>Get Contents of URL</code>
+          Add action: <code>Open URLs</code>
           <ul>
-            <li>Method: <strong>POST</strong></li>
-            <li>
-              Headers: Add <code>x-api-key</code> with your API key, and
-              <code>Content-Type</code> with <code>application/json</code>
-            </li>
-            <li>Request Body: JSON with <code>{"url": "Shortcut Input"}</code></li>
+            <li>URL: <code id="shortcut-url">https://yoursite.com/links/new?url=[Shortcut Input]&key=YOUR_KEY</code></li>
           </ul>
         </li>
-        <li>Add action: <code>Show Notification</code> with "Link saved!"</li>
         <li>
           Tap the shortcut name and enable <strong>Show in Share Sheet</strong>
         </li>
@@ -276,18 +319,23 @@ GITHUB_BRANCH=main</code></pre>
 
     <script>
       function generateBookmarklet() {
-        const apiUrl = document.getElementById("apiUrl").value;
+        const siteUrl = document.getElementById("siteUrl").value.replace(/\/$/, "");
         const apiKey = document.getElementById("apiKey").value;
 
-        if (!apiUrl || !apiKey) {
-          alert("Please enter both API URL and API Key");
+        if (!siteUrl || !apiKey) {
+          alert("Please enter both Site URL and API Key");
           return;
         }
 
-        const code = `javascript:(function(){const API_URL="${apiUrl}";const API_KEY="${apiKey}";const url=window.location.href;const overlay=document.createElement("div");overlay.innerHTML='<div style="position:fixed;top:20px;right:20px;background:%231a1a1a;color:white;padding:16px 24px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:14px;z-index:999999;box-shadow:0 4px 12px rgba(0,0,0,0.3)"><span id="save-link-status">Saving link...</span></div>';document.body.appendChild(overlay);const statusEl=document.getElementById("save-link-status");fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY},body:JSON.stringify({url})}).then(r=>r.json()).then(d=>{if(d.success){statusEl.textContent="Link saved!";statusEl.style.color="#4ade80"}else{statusEl.textContent="Error: "+(d.error||"Unknown");statusEl.style.color="#f87171"}}).catch(e=>{statusEl.textContent="Error: "+e.message;statusEl.style.color="#f87171"}).finally(()=>{setTimeout(()=>overlay.remove(),2000)})})();`;
+        // Generate bookmarklet code
+        const code = `javascript:(function(){window.open('${siteUrl}/links/new?url='+encodeURIComponent(window.location.href)+'&key=${apiKey}','_blank','width=800,height=900,scrollbars=yes')})();`;
 
         const bookmarklet = document.getElementById("bookmarklet");
         bookmarklet.href = code;
+
+        // Update shortcut URL example
+        document.getElementById("shortcut-url").textContent =
+          `${siteUrl}/links/new?url=[Shortcut Input]&key=${apiKey}`;
 
         document.getElementById("bookmarklet-section").style.display = "block";
       }
