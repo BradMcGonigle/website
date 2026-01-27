@@ -1,0 +1,40 @@
+---
+version: "0.6.0"
+date: 2026-01-27
+title: Dark Mode & Mobile Navigation
+description: Added theme switching and responsive mobile navigation
+tags:
+  - feature
+---
+
+Enhanced the user experience with dark mode support and improved mobile navigation.
+
+## Dark Mode
+
+Implemented a complete theming system with three modes:
+
+- **Light** - Clean, bright theme for daytime use
+- **Dark** - Reduced eye strain theme for low-light environments
+- **System** - Automatically matches your OS preference
+
+### Technical Details
+
+- Theme toggle component with accessible radio group pattern
+- [next-themes](https://github.com/pacocoursey/next-themes) for hydration-safe theme management
+- CSS variables for seamless color transitions
+- [lucide-react](https://lucide.dev/) icons for theme indicators
+
+## Mobile Navigation
+
+Added a responsive hamburger menu for mobile devices:
+
+- Collapsible menu that appears on screens smaller than `md` breakpoint
+- Smooth open/close transitions with Menu and X icons
+- Accessible with proper ARIA attributes (`aria-expanded`, `aria-controls`)
+- Auto-closes when navigating to a new page
+
+## Testing Improvements
+
+- Added E2E tests for theme toggle functionality
+- Created mobile navigation E2E test suite
+- Integrated [Playwright](https://playwright.dev/) HTML reports into CI summary for easier debugging

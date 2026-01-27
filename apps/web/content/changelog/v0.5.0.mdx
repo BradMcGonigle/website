@@ -1,0 +1,43 @@
+---
+version: "0.5.0"
+date: 2026-01-26
+title: Blog Infrastructure
+description: Added blog pages with MDX content, syntax highlighting, and improved typography
+tags:
+  - feature
+---
+
+Launched the blog section with full MDX support and migrated existing content.
+
+## Blog Pages
+
+Created two new page packages following the established architecture:
+
+- **pages.blog-list** - Displays all blog posts with title, date, and description
+- **pages.blog-post** - Renders individual posts with MDX content support
+
+## Content Migration
+
+Migrated 7 blog posts covering React, CI/CD, and mobile development:
+
+- GitHub Actions for Continuous Deployment
+- Deploying to Netlify via CircleCI
+- Understanding React Fragments
+- Introducing React NHL Logos
+- Fastlane Mobile App Builds
+- Drafts for Gatsby
+- Using Bulma with React
+
+## Syntax Highlighting
+
+Integrated [rehype-pretty-code](https://rehype-pretty-code.netlify.app/) with [Shiki](https://shiki.style/) for code block syntax highlighting:
+
+- Dual theme support for light and dark modes
+- Language-aware highlighting
+- Clean, minimal code block styling
+
+## Typography & Accessibility
+
+- Configured [@tailwindcss/typography](https://tailwindcss.com/docs/typography-plugin) for consistent prose styling
+- Improved color contrast to meet WCAG AA compliance
+- Integrated typography styles with the design system
