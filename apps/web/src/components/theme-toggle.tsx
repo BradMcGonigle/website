@@ -2,7 +2,7 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const themes = [
   { value: "system", label: "System", icon: Monitor },
@@ -10,13 +10,20 @@ const themes = [
   { value: "dark", label: "Dark", icon: Moon },
 ] as const;
 
+// No-op subscribe function for useSyncExternalStore (client detection only)
+function subscribe() {
+  return function unsubscribe() {
+    // intentionally empty
+  };
+}
+
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  );
 
   if (!mounted) {
     return (
