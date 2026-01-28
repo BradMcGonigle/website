@@ -125,7 +125,7 @@ export default function HomePage({ posts, links }: HomePageProps) {
                   <article className="group">
                     <Link
                       href={post.permalink}
-                      className="block rounded-lg border border-transparent p-4 transition-colors hover:border-border hover:bg-accent/50"
+                      className="block rounded-lg border border-border p-4 transition-colors hover:border-primary hover:bg-accent/50"
                     >
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <time
