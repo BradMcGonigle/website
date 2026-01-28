@@ -79,7 +79,7 @@ export default function HomePage({ posts, links }: HomePageProps) {
           delay={0.1}
           className="mt-4 max-w-2xl text-lg text-muted-foreground sm:text-xl"
         >
-          I&apos;m a software developer from Orlando, Florida building things on
+          I&apos;m a software engineer from Orlando, Florida building things on
           the internet.
         </AnimatedText>
         <AnimatedSection delay={0.2} className="mt-6 flex gap-4">
