@@ -17,6 +17,12 @@ Do NOT commit until all checks pass. If any check fails, fix the issues first.
 pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e
 ```
 
+## Creating New Packages
+
+When creating a new package in `packages/` that uses Tailwind CSS classes, add its path to `apps/web/tailwind.config.js` in the `content` array. Otherwise, Tailwind won't scan the package for classes and they won't be generated.
+
+Example pattern: `"../../packages/components/my-package/src/**/*.{ts,tsx}"`
+
 ## Changelog
 
 Update the changelog when making meaningful changes to the site. Not every change needs an entry.
