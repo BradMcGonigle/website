@@ -2,24 +2,78 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import HomePage from "./index";
 
+const mockPosts = [
+  {
+    title: "Test Post",
+    description: "A test post description",
+    date: "2024-01-15",
+    createdAt: "2024-01-15T10:00:00Z",
+    slug: "test-post",
+    permalink: "/blog/test-post",
+    tags: ["test"],
+    draft: false,
+    metadata: {
+      readingTime: 5,
+      wordCount: 1000,
+    },
+  },
+];
+
+const mockLinks = [
+  {
+    title: "Test Link",
+    description: "A test link description",
+    url: "https://example.com",
+    date: "2024-01-10",
+    createdAt: "2024-01-10T10:00:00Z",
+    tags: ["test"],
+    slug: "test-link",
+  },
+];
+
 describe("HomePage", () => {
-  it("renders the heading with the site owner name", () => {
-    render(<HomePage />);
+  it("renders the hero heading", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
     expect(
-      screen.getByRole("heading", { name: "Brad McGonigle", level: 1 })
+      screen.getByRole("heading", { name: /Hi, I'm Brad/i, level: 1 })
     ).toBeInTheDocument();
   });
 
-  it("renders the welcome text", () => {
-    render(<HomePage />);
+  it("renders the tagline", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
     expect(
-      screen.getByText(/Welcome to my personal website/i)
+      screen.getByText(/software developer from Orlando/i)
     ).toBeInTheDocument();
   });
 
-  it("has a properly labeled hero section", () => {
-    render(<HomePage />);
-    const section = screen.getByRole("region", { name: /Brad McGonigle/i });
-    expect(section).toBeInTheDocument();
+  it("renders the writings section", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
+    expect(
+      screen.getByRole("heading", { name: /Writings/i, level: 2 })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the links section", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
+    expect(
+      screen.getByRole("heading", { name: /Links/i, level: 2 })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the contact section", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
+    expect(
+      screen.getByRole("heading", { name: /Say Hi/i, level: 2 })
+    ).toBeInTheDocument();
+  });
+
+  it("renders recent posts", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
+    expect(screen.getByText("Test Post")).toBeInTheDocument();
+  });
+
+  it("renders recent links", () => {
+    render(<HomePage posts={mockPosts} links={mockLinks} />);
+    expect(screen.getByText("Test Link")).toBeInTheDocument();
   });
 });
