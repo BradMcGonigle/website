@@ -1,0 +1,10 @@
+{
+  "extends": "configs.typescript/tsconfig.react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "types": ["@testing-library/jest-dom"]
+  },
+  "include": ["src", "*.mjs", "*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

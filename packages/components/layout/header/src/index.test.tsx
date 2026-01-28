@@ -53,6 +53,10 @@ describe("Header", () => {
       "href",
       "/about"
     );
+    expect(screen.getByRole("link", { name: "Resume" })).toHaveAttribute(
+      "href",
+      "/resume"
+    );
     expect(screen.getByRole("link", { name: "Blog" })).toHaveAttribute(
       "href",
       "/blog"
@@ -72,7 +76,7 @@ describe("Header", () => {
     const list = screen.getByRole("list");
     expect(list).toBeInTheDocument();
     const listItems = screen.getAllByRole("listitem");
-    expect(listItems).toHaveLength(5);
+    expect(listItems).toHaveLength(6);
   });
 
   describe("Mobile menu", () => {
@@ -136,6 +140,7 @@ describe("Header", () => {
       });
       expect(mobileNav.querySelector('a[href="/"]')).toBeInTheDocument();
       expect(mobileNav.querySelector('a[href="/about"]')).toBeInTheDocument();
+      expect(mobileNav.querySelector('a[href="/resume"]')).toBeInTheDocument();
       expect(mobileNav.querySelector('a[href="/blog"]')).toBeInTheDocument();
       expect(mobileNav.querySelector('a[href="/links"]')).toBeInTheDocument();
       expect(

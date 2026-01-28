@@ -1,8 +1,8 @@
 {
-  "name": "pages.about",
+  "name": "pages.resume",
   "version": "0.0.0",
   "private": true,
-  "description": "About page component",
+  "description": "Resume page component",
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "exports": {
@@ -18,9 +18,6 @@
   "peerDependencies": {
     "react": "catalog:",
     "react-dom": "catalog:"
-  },
-  "dependencies": {
-    "next": "catalog:"
   },
   "devDependencies": {
     "@testing-library/dom": "catalog:",
