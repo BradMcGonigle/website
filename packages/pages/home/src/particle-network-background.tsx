@@ -159,7 +159,7 @@ export function ParticleNetworkBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-60"
+      className="pointer-events-none fixed inset-0 z-0 opacity-60"
       aria-hidden="true"
     />
   );
