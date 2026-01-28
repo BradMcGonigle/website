@@ -142,6 +142,32 @@
     @apply rounded-t-none;
   }
 
+  /* Dot grid background animation */
+  .dot-grid-bg {
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--muted-foreground) / 0.12) 1px,
+      transparent 1px
+    );
+    background-size: 32px 32px;
+    mask-image: radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      black 40%,
+      transparent 100%
+    );
+    animation: dot-grid-pulse 10s ease-in-out infinite;
+  }
+
+  @keyframes dot-grid-pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
   /* Fade up animation for staggered list items */
   .animate-fade-up {
     animation: fade-up 0.4s ease-out forwards;
