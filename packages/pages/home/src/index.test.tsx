@@ -42,7 +42,7 @@ describe("HomePage", () => {
   it("renders the tagline", () => {
     render(<HomePage posts={mockPosts} links={mockLinks} />);
     expect(
-      screen.getByText(/software developer from Orlando/i)
+      screen.getByText(/software engineer from Orlando/i)
     ).toBeInTheDocument();
   });
 
