@@ -32,7 +32,7 @@ test.describe("Navigation", () => {
     // Verify navigation succeeded
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Brad McGonigle"
+      "Hi, I'm Brad."
     );
   });
 

@@ -14,7 +14,7 @@ test.describe("Smoke Tests", () => {
 
     // Critical content visible
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Brad McGonigle"
+      "Hi, I'm Brad."
     );
 
     // Layout elements present

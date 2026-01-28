@@ -1,57 +1,39 @@
 "use client";
 
-import { motion, useInView, type Variants } from "framer-motion";
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
-// Fade up animation for sections
-const fadeUpVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.4, 0.25, 1],
-    },
-  },
-};
+/**
+ * Custom hook for detecting when an element enters the viewport.
+ * Uses native Intersection Observer API.
+ */
+function useInView(options?: { threshold?: number; rootMargin?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
 
-// Stagger children animation
-const staggerContainerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
-  },
-};
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
 
-const staggerItemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.4, 0.25, 1],
-    },
-  },
-};
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect(); // Only trigger once
+        }
+      },
+      {
+        threshold: options?.threshold ?? 0.1,
+        rootMargin: options?.rootMargin ?? "-50px",
+      }
+    );
 
-// Hero text reveal animation
-const heroTextVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.4, 0.25, 1],
-    },
-  },
-};
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [options?.threshold, options?.rootMargin]);
+
+  return { ref, isInView };
+}
 
 interface AnimatedSectionProps {
   children: ReactNode;
@@ -61,23 +43,21 @@ interface AnimatedSectionProps {
 
 export function AnimatedSection({
   children,
-  className,
+  className = "",
   delay = 0,
 }: AnimatedSectionProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { ref, isInView } = useInView();
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={fadeUpVariants}
-      transition={{ delay }}
-      className={className}
+      className={`transition-all duration-500 ease-out ${
+        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+      } ${className}`}
+      style={{ transitionDelay: `${delay * 1000}ms` }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -91,24 +71,29 @@ interface AnimatedTextProps {
 
 export function AnimatedText({
   children,
-  className,
+  className = "",
   delay = 0,
   as: Component = "p",
   id,
 }: AnimatedTextProps) {
-  const MotionComponent = motion.create(Component);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Small delay to ensure CSS transition works on mount
+    const timer = setTimeout(() => setIsVisible(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <MotionComponent
-      initial="hidden"
-      animate="visible"
-      variants={heroTextVariants}
-      transition={{ delay }}
-      className={className}
+    <Component
       id={id}
+      className={`transition-all duration-500 ease-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      } ${className}`}
+      style={{ transitionDelay: `${delay * 1000}ms` }}
     >
       {children}
-    </MotionComponent>
+    </Component>
   );
 }
 
@@ -117,36 +102,34 @@ interface AnimatedListProps {
   className?: string;
 }
 
-export function AnimatedList({ children, className }: AnimatedListProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+export function AnimatedList({ children, className = "" }: AnimatedListProps) {
+  const { ref, isInView } = useInView();
 
   return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={staggerContainerVariants}
-      className={className}
-    >
-      {children}
-    </motion.div>
+    <div ref={ref} className={className}>
+      {isInView ? children : null}
+    </div>
   );
 }
 
 interface AnimatedListItemProps {
   children: ReactNode;
   className?: string;
+  index?: number;
 }
 
 export function AnimatedListItem({
   children,
-  className,
+  className = "",
+  index = 0,
 }: AnimatedListItemProps) {
   return (
-    <motion.div variants={staggerItemVariants} className={className}>
+    <div
+      className={`animate-fade-up ${className}`}
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -155,13 +138,12 @@ interface AnimatedCardProps {
   className?: string;
 }
 
-export function AnimatedCard({ children, className }: AnimatedCardProps) {
+export function AnimatedCard({ children, className = "" }: AnimatedCardProps) {
   return (
-    <motion.div
-      className={className}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+    <div
+      className={`transition-transform duration-200 ease-out hover:-translate-y-1 ${className}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

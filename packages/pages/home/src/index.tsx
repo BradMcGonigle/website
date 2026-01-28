@@ -119,8 +119,8 @@ export default function HomePage({ posts, links }: HomePageProps) {
           </p>
 
           <AnimatedList className="mt-8 space-y-6">
-            {recentPosts.map((post) => (
-              <AnimatedListItem key={post.slug}>
+            {recentPosts.map((post, index) => (
+              <AnimatedListItem key={post.slug} index={index}>
                 <AnimatedCard>
                   <article className="group">
                     <Link
@@ -175,8 +175,8 @@ export default function HomePage({ posts, links }: HomePageProps) {
           </p>
 
           <AnimatedList className="mt-8 grid gap-4 sm:grid-cols-2">
-            {recentLinks.map((link) => (
-              <AnimatedListItem key={link.slug}>
+            {recentLinks.map((link, index) => (
+              <AnimatedListItem key={link.slug} index={index}>
                 <AnimatedCard className="h-full">
                   <a
                     href={link.url}

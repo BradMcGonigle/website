@@ -36,7 +36,6 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "framer-motion": "^12.29.2",
     "lucide-react": "^0.563.0",
     "next": "catalog:",
     "utils.core.format": "workspace:*"
