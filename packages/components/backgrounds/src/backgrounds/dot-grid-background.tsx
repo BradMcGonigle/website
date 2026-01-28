@@ -5,7 +5,7 @@ import { useEffect, useRef, useCallback } from "react";
 const DOT_SPACING = 28;
 const DOT_RADIUS = 2;
 const PULSE_DURATION = 8000; // 8 seconds, matching original CSS
-const BASE_OPACITY = 0.5; // Base dot opacity before fade
+const BASE_OPACITY = 0.3; // Base dot opacity before fade
 
 export function DotGridBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,6 +20,15 @@ export function DotGridBackground() {
     const parts = hsl.split(" ").map((v) => parseFloat(v));
     return { h: parts[0] ?? 215, s: parts[1] ?? 16, l: parts[2] ?? 47 };
   }, []);
+
+  const isDarkMode = useCallback(() => {
+    if (typeof window === "undefined") return true;
+    return document.documentElement.classList.contains("dark");
+  }, []);
+
+  const getOpacityMultiplier = useCallback(() => {
+    return isDarkMode() ? 1 : 0.5;
+  }, [isDarkMode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,6 +52,7 @@ export function DotGridBackground() {
       const width = window.innerWidth;
       const height = window.innerHeight;
       const color = getComputedColor();
+      const opacityMult = getOpacityMultiplier();
 
       // Calculate pulse opacity (ease-in-out between 0.6 and 1.0)
       const elapsed = performance.now() - startTimeRef.current;
@@ -78,7 +88,7 @@ export function DotGridBackground() {
           }
 
           const fadeOpacity = horizontalFade * verticalFade;
-          const finalOpacity = pulseOpacity * fadeOpacity * BASE_OPACITY;
+          const finalOpacity = pulseOpacity * fadeOpacity * BASE_OPACITY * opacityMult;
           if (finalOpacity <= 0.02) continue;
 
           ctx.beginPath();
@@ -100,7 +110,7 @@ export function DotGridBackground() {
       cancelAnimationFrame(animationRef.current);
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [getComputedColor]);
+  }, [getComputedColor, getOpacityMultiplier]);
 
   return (
     <canvas

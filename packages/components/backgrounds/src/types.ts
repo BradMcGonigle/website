@@ -1,6 +1,13 @@
 import type { ComponentType } from "react";
 
-export type BackgroundId = "dot-grid" | "topographic";
+export type BackgroundId =
+  | "dot-grid"
+  | "topographic"
+  | "flow-field"
+  | "constellation"
+  | "wave-interference"
+  | "aurora"
+  | "voronoi";
 
 export interface BackgroundConfig {
   id: BackgroundId;
@@ -13,4 +20,5 @@ export interface BackgroundContextValue {
   currentBackground: BackgroundId;
   backgrounds: BackgroundConfig[];
   isLoading: boolean;
+  setBackground?: (id: BackgroundId) => void;
 }

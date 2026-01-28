@@ -3,7 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Header } from "components.layout.header";
 import { Footer } from "components.layout.footer";
-import { BackgroundProvider } from "components.backgrounds";
+import { BackgroundProvider, DevBackgroundToolbar } from "components.backgrounds";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import "./globals.css";
@@ -33,6 +33,7 @@ export default function RootLayout({
             Skip to main content
           </a>
           <BackgroundProvider>
+            <DevBackgroundToolbar />
             <Header actions={<ThemeToggle />} />
             <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
               {children}
