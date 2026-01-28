@@ -34,5 +34,10 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "lucide-react": "^0.563.0",
+    "next": "catalog:",
+    "utils.core.format": "workspace:*"
   }
 }
