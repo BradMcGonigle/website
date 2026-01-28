@@ -3,8 +3,9 @@
 import { useEffect, useRef, useCallback } from "react";
 
 const DOT_SPACING = 28;
-const DOT_RADIUS = 1.5;
+const DOT_RADIUS = 2;
 const PULSE_DURATION = 8000; // 8 seconds, matching original CSS
+const BASE_OPACITY = 0.5; // Base dot opacity before fade
 
 export function DotGridBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,8 +47,8 @@ export function DotGridBackground() {
       // Calculate pulse opacity (ease-in-out between 0.6 and 1.0)
       const elapsed = performance.now() - startTimeRef.current;
       const progress = (elapsed % PULSE_DURATION) / PULSE_DURATION;
-      // Sine wave for smooth ease-in-out: goes from 0.6 to 1.0 and back
-      const pulseOpacity = 0.6 + 0.4 * Math.sin(progress * Math.PI * 2 - Math.PI / 2) * 0.5 + 0.2;
+      // Sine wave oscillates between 0.6 and 1.0
+      const pulseOpacity = 0.8 + 0.2 * Math.sin(progress * Math.PI * 2);
 
       ctx.clearRect(0, 0, width, height);
 
@@ -55,30 +56,30 @@ export function DotGridBackground() {
       const cols = Math.ceil(width / DOT_SPACING) + 1;
       const rows = Math.ceil(height / DOT_SPACING) + 1;
 
-      // Fade parameters matching original CSS mask
+      // Fade from top (matching original CSS mask)
       // mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 20%, transparent 70%)
       const centerX = width / 2;
-      const ellipseWidth = width;
-      const ellipseHeight = height * 0.7;
+      const fadeStartY = height * 0.2;
+      const fadeEndY = height * 0.7;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const x = col * DOT_SPACING;
           const y = row * DOT_SPACING;
 
-          // Calculate distance from top-center using ellipse formula
-          const dx = (x - centerX) / (ellipseWidth / 2);
-          const dy = y / ellipseHeight;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          // Horizontal fade from center
+          const horizontalDistance = Math.abs(x - centerX) / (width / 2);
+          const horizontalFade = Math.max(0, 1 - horizontalDistance * 0.3);
 
-          // Fade based on distance (20% to 70% of ellipse)
-          let fadeOpacity = 1;
-          if (distance > 0.2) {
-            fadeOpacity = Math.max(0, 1 - (distance - 0.2) / 0.5);
+          // Vertical fade from top
+          let verticalFade = 1;
+          if (y > fadeStartY) {
+            verticalFade = Math.max(0, 1 - (y - fadeStartY) / (fadeEndY - fadeStartY));
           }
 
-          const finalOpacity = pulseOpacity * fadeOpacity * 0.5;
-          if (finalOpacity <= 0) continue;
+          const fadeOpacity = horizontalFade * verticalFade;
+          const finalOpacity = pulseOpacity * fadeOpacity * BASE_OPACITY;
+          if (finalOpacity <= 0.02) continue;
 
           ctx.beginPath();
           ctx.arc(x, y, DOT_RADIUS, 0, Math.PI * 2);
@@ -106,6 +107,7 @@ export function DotGridBackground() {
       ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-0"
       aria-hidden="true"
+      data-background="dot-grid"
     />
   );
 }
