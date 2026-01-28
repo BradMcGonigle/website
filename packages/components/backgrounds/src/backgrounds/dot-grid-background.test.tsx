@@ -1,36 +1,52 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { DotGridBackground } from "./dot-grid-background";
 
 describe("DotGridBackground", () => {
-  it("renders a div element", () => {
+  beforeEach(() => {
+    // Mock canvas context
+    const mockContext = {
+      clearRect: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      scale: vi.fn(),
+      fillStyle: "",
+    };
+
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+      mockContext as unknown as CanvasRenderingContext2D
+    );
+  });
+
+  it("renders a canvas element", () => {
     render(<DotGridBackground />);
-    const element = document.querySelector(".dot-grid-bg");
-    expect(element).toBeInTheDocument();
+    const canvas = document.querySelector("canvas");
+    expect(canvas).toBeInTheDocument();
   });
 
   it("has aria-hidden attribute for accessibility", () => {
     render(<DotGridBackground />);
-    const element = document.querySelector(".dot-grid-bg");
-    expect(element).toHaveAttribute("aria-hidden", "true");
+    const canvas = document.querySelector("canvas");
+    expect(canvas).toHaveAttribute("aria-hidden", "true");
   });
 
   it("has pointer-events-none class", () => {
     render(<DotGridBackground />);
-    const element = document.querySelector(".dot-grid-bg");
-    expect(element).toHaveClass("pointer-events-none");
+    const canvas = document.querySelector("canvas");
+    expect(canvas).toHaveClass("pointer-events-none");
   });
 
   it("is fixed positioned", () => {
     render(<DotGridBackground />);
-    const element = document.querySelector(".dot-grid-bg");
-    expect(element).toHaveClass("fixed");
-    expect(element).toHaveClass("inset-0");
+    const canvas = document.querySelector("canvas");
+    expect(canvas).toHaveClass("fixed");
+    expect(canvas).toHaveClass("inset-0");
   });
 
   it("has z-0 for proper stacking", () => {
     render(<DotGridBackground />);
-    const element = document.querySelector(".dot-grid-bg");
-    expect(element).toHaveClass("z-0");
+    const canvas = document.querySelector("canvas");
+    expect(canvas).toHaveClass("z-0");
   });
 });

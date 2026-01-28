@@ -7,7 +7,6 @@ import { BackgroundProvider } from "components.backgrounds";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import "./globals.css";
-import "components.backgrounds/styles/dot-grid.css";
 
 export const metadata: Metadata = {
   title: "Brad McGonigle",

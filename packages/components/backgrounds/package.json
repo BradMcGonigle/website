@@ -6,8 +6,7 @@
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "exports": {
-    ".": "./src/index.tsx",
-    "./styles/dot-grid.css": "./src/styles/dot-grid.css"
+    ".": "./src/index.tsx"
   },
   "scripts": {
     "lint": "eslint .",
