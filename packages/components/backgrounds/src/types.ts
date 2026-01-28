@@ -1,4 +1,4 @@
-import type { LazyExoticComponent, ComponentType } from "react";
+import type { ComponentType } from "react";
 
 export type BackgroundId = "dot-grid" | "topographic";
 
@@ -6,7 +6,7 @@ export interface BackgroundConfig {
   id: BackgroundId;
   name: string;
   description: string;
-  component: LazyExoticComponent<ComponentType>;
+  component: ComponentType;
 }
 
 export interface BackgroundContextValue {

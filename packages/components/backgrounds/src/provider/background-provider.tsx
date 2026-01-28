@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useSyncExternalStore, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { backgrounds } from "../backgrounds";
 import { BackgroundContext } from "./background-context";
 import { useBackgroundSelection } from "../hooks/use-background-selection";
@@ -44,11 +44,7 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
       value={{ currentBackground, backgrounds, isLoading }}
     >
       {children}
-      {BackgroundComponent && (
-        <Suspense fallback={null}>
-          <BackgroundComponent />
-        </Suspense>
-      )}
+      {BackgroundComponent && <BackgroundComponent />}
     </BackgroundContext.Provider>
   );
 }

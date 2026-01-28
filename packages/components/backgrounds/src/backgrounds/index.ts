@@ -1,4 +1,5 @@
-import { lazy } from "react";
+import { DotGridBackground } from "./dot-grid-background";
+import { TopographicBackground } from "./topographic-background";
 import type { BackgroundConfig } from "../types";
 
 export const backgrounds: BackgroundConfig[] = [
@@ -6,16 +7,12 @@ export const backgrounds: BackgroundConfig[] = [
     id: "dot-grid",
     name: "Dot Grid",
     description: "CSS-based pulsing dot grid pattern",
-    component: lazy(() =>
-      import("./dot-grid-background").then((m) => ({ default: m.DotGridBackground }))
-    ),
+    component: DotGridBackground,
   },
   {
     id: "topographic",
     name: "Topographic",
     description: "Canvas-based Perlin noise contour lines",
-    component: lazy(() =>
-      import("./topographic-background").then((m) => ({ default: m.TopographicBackground }))
-    ),
+    component: TopographicBackground,
   },
 ];
