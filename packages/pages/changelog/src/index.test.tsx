@@ -6,6 +6,7 @@ const mockEntries: ChangelogEntry[] = [
   {
     version: "0.2.0",
     date: "2025-02-01",
+    createdAt: "2025-02-01T12:00:00.000Z",
     title: "New Feature Release",
     description: "Added new features",
     breaking: false,
@@ -17,6 +18,7 @@ const mockEntries: ChangelogEntry[] = [
   {
     version: "0.1.0",
     date: "2025-01-26",
+    createdAt: "2025-01-26T12:00:00.000Z",
     title: "Initial Release",
     description: "First release",
     breaking: false,

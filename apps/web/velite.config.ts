@@ -11,6 +11,7 @@ const blog = defineCollection({
       title: s.string().max(99),
       description: s.string().max(999),
       date: s.isodate(),
+      createdAt: s.string().datetime({ offset: true }),
       updated: s.isodate().optional(),
       draft: s.boolean().default(false),
       tags: s.array(s.string()).default([]),
@@ -51,6 +52,7 @@ const changelog = defineCollection({
     .object({
       version: s.string(),
       date: s.isodate(),
+      createdAt: s.string().datetime({ offset: true }),
       title: s.string().max(99),
       description: s.string().max(999).optional(),
       breaking: s.boolean().default(false),
@@ -76,6 +78,7 @@ const links = defineCollection({
       url: s.string().url(),
       image: s.string().optional(),
       date: s.isodate(),
+      createdAt: s.string().datetime({ offset: true }),
       tags: s.array(s.string()).default([]),
     })
     .transform((data, { meta }) => ({

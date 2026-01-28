@@ -5,6 +5,7 @@ export interface Post {
   title: string;
   description: string;
   date: string;
+  createdAt: string;
   slug: string;
   permalink: string;
   tags: string[];
@@ -18,7 +19,12 @@ export interface BlogListPageProps {
 export default function BlogListPage({ posts }: BlogListPageProps) {
   const publishedPosts = posts
     .filter((post) => !post.draft)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => {
+      const dateCompare =
+        new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (dateCompare !== 0) return dateCompare;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
