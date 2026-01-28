@@ -1,0 +1,26 @@
+---
+version: "0.10.0"
+date: 2026-01-28
+createdAt: 2026-01-28T11:00:00.000Z
+title: Homepage Animations
+description: Added subtle entrance animations to the homepage
+tags:
+  - improvement
+---
+
+Enhanced the homepage with smooth entrance animations for a more polished feel.
+
+## Animations
+
+- Staggered fade-in animations for homepage sections
+- Smooth transitions as elements enter the viewport
+- Responsive to user scroll position
+
+## Technical Details
+
+Implemented using pure CSS and native browser APIs:
+
+- CSS keyframes and transitions for animations
+- Custom `useInView` hook using Intersection Observer API
+- Zero external dependencies (~50KB bundle size reduction vs framer-motion)
+- Follows the principle of preferring native browser APIs when functionality is equivalent

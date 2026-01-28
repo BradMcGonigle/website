@@ -1,0 +1,32 @@
+---
+version: "0.8.0"
+date: 2026-01-28
+createdAt: 2026-01-28T02:00:00.000Z
+title: Links API & Bookmarklet
+description: Added API endpoints and a browser bookmarklet for quickly saving links
+tags:
+  - feature
+---
+
+Added a streamlined workflow for saving interesting links directly from the browser.
+
+## Bookmarklet
+
+A browser bookmarklet that captures the current page and opens the link saving interface:
+
+- One-click capture of page URL, title, and metadata
+- Opens `/links/new` with pre-filled information
+- Works on any website you're browsing
+
+## Links API
+
+New API endpoints for programmatic link management:
+
+- `/api/links/preview` - Fetches page metadata (title, description, images)
+- `/api/links` - Saves links via GitHub API to create content files
+- Image selection UI for choosing the best preview image
+- API key authentication for protected endpoints
+
+## Documentation
+
+Added setup documentation in `tools/link-bookmarklet/README.md` with installation instructions.
