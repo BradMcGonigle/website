@@ -10,7 +10,6 @@ import {
   AnimatedListItem,
   AnimatedCard,
 } from "./animations";
-import { TopographicBackground } from "./topographic-background";
 
 export interface Post {
   title: string;
@@ -64,9 +63,7 @@ export default function HomePage({ posts, links }: HomePageProps) {
     .slice(0, 4);
 
   return (
-    <>
-      <TopographicBackground />
-      <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <section aria-labelledby="hero-heading" className="pb-16">
         <AnimatedText
@@ -209,7 +206,6 @@ export default function HomePage({ posts, links }: HomePageProps) {
           </AnimatedList>
         </section>
       </AnimatedSection>
-      </div>
-    </>
+    </div>
   );
 }

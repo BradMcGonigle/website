@@ -127,7 +127,7 @@ export function TopographicBackground() {
 
       // Draw contour lines using marching squares with interpolation
       for (let level = 0; level < CONTOUR_LEVELS; level++) {
-        const threshold = -0.5 + (level / CONTOUR_LEVELS);
+        const threshold = -0.5 + level / CONTOUR_LEVELS;
         const opacity = 0.08 + (level / CONTOUR_LEVELS) * 0.15;
         const fadeY = height * 0.6;
 
