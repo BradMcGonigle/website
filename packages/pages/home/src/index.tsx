@@ -10,7 +10,7 @@ import {
   AnimatedListItem,
   AnimatedCard,
 } from "./animations";
-import { DotGridBackground } from "./dot-grid-background";
+import { TopographicBackground } from "./topographic-background";
 
 export interface Post {
   title: string;
@@ -65,7 +65,7 @@ export default function HomePage({ posts, links }: HomePageProps) {
 
   return (
     <>
-      <DotGridBackground />
+      <TopographicBackground />
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <section aria-labelledby="hero-heading" className="pb-16">
