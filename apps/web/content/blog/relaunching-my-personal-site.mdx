@@ -1,0 +1,106 @@
+---
+title: Relaunching My Personal Site with Next.js 16, React 19, and Claude Code
+description: After years on Gatsby, I've rebuilt my personal site from the ground up with a modern monorepo architecture, custom canvas animations, and an AI-assisted development workflow that's changed how I approach side projects.
+date: 2025-01-28
+createdAt: 2025-01-28T00:00:00.000Z
+tags:
+  - Development
+  - Next.js
+  - React
+  - AI
+---
+
+Personal sites have a way of falling behind. You build something, tweak it for a while, and then life happens. My previous Gatsby site served me well for years, but the ecosystem moved on, dependencies grew stale, and every time I thought about making changes, the friction felt insurmountable. So I did what any reasonable developer would do—I rebuilt the entire thing from scratch.
+
+## Why Start Over?
+
+The honest answer is that I wanted to play with new tools. Next.js has matured significantly with the App Router, React 19 brings exciting new patterns, and Tailwind CSS v4 shipped with some nice improvements. But beyond the shiny new toys, I wanted a foundation that would be easier to maintain and extend over time.
+
+My previous site was a single Gatsby application that had grown organically over the years. This time, I opted for a monorepo structure using pnpm workspaces and Turborepo. The separation of concerns feels cleaner—shared configs live in one place, UI components are isolated in their own packages, and the Next.js app itself stays focused on routing and page composition.
+
+## The Tech Stack
+
+Here's what's powering the new site:
+
+- **Next.js 16** with the App Router for routing and server components
+- **React 19** for the UI layer
+- **TypeScript** throughout for type safety
+- **Tailwind CSS v4** for styling
+- **Velite** for type-safe MDX content management
+- **Vitest** and **Playwright** for testing
+- **Turborepo** for monorepo orchestration
+
+The monorepo structure keeps things organized:
+
+```
+packages/
+  ├── pages/          # Page-level components
+  ├── components/     # Shared UI components
+  └── utils/          # Shared utilities
+configs/              # Shared TypeScript, ESLint, Tailwind configs
+apps/web/             # The Next.js application
+```
+
+Each package has a clear responsibility. When I want to update how blog posts render, I know exactly where to look. When I need to add a new utility function, it goes in one place and is available everywhere.
+
+## Content Management with Velite
+
+One of the discoveries I'm most pleased with is [Velite](https://velite.js.org/). It's a content layer that transforms MDX files into type-safe collections. Define a schema, point it at your content directory, and you get fully typed data to work with in your components.
+
+```typescript
+const blog = defineCollection({
+  name: 'Blog',
+  pattern: 'blog/**/*.mdx',
+  schema: s.object({
+    title: s.string(),
+    description: s.string(),
+    date: s.isodate(),
+    tags: s.array(s.string()).optional(),
+    draft: s.boolean().default(false),
+  }),
+})
+```
+
+The draft functionality I wrote about years ago for Gatsby is now just a single line in the schema. Velite handles the rest, including generating slugs, calculating reading time, and validating that all my frontmatter is correct.
+
+## Custom Canvas Animations
+
+I wanted the site to feel a bit more alive without reaching for heavy animation libraries. The background features two canvas-based animations that rotate throughout the day—a subtle dot grid with a pulsing effect and topographic contour lines generated with Perlin noise.
+
+Both animations use native browser APIs and adapt to the current theme. They're rendered on a canvas element positioned behind the content, so they don't interfere with interactions or accessibility. The rotation happens every 8 hours, giving the site a slightly different character depending on when you visit.
+
+Building these without Framer Motion or similar libraries kept the bundle lean and gave me more control over the rendering. The dot grid uses a simple sine wave for the pulse timing, while the topographic background implements marching squares for the contour rendering—a technique I hadn't worked with before and found surprisingly satisfying to implement.
+
+## Dark Mode Done Right
+
+Theme support was non-negotiable. The site supports light mode, dark mode, and a system preference option that follows your OS setting. I'm using [next-themes](https://github.com/pacocoursey/next-themes) for hydration-safe theme management, which handles all the edge cases around server rendering and flash-of-wrong-theme issues.
+
+The syntax highlighting adapts too—code blocks use Shiki with dual themes that switch automatically. It's a small detail but makes a real difference when reading technical content.
+
+## The Claude Code Experiment
+
+Here's where things get interesting. I built a significant portion of this site using [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Anthropic's CLI tool for AI-assisted development. It's been a different way of working.
+
+Rather than writing every line myself, I found myself describing what I wanted—"add a mobile navigation menu that slides in from the right" or "create a canvas animation with pulsing dots"—and then reviewing, refining, and iterating on the results. The back-and-forth felt more like pair programming than autocomplete.
+
+What surprised me was how it changed my ambition for side projects. Features I might have skipped due to time constraints—comprehensive E2E tests, accessible mobile navigation, animated backgrounds—became feasible because the implementation friction dropped. I could focus more on what I wanted the site to do and less on the mechanics of making it happen.
+
+It's not magic. I still needed to understand what was being generated, catch issues, and make decisions about architecture. But the ratio of thinking to typing shifted in a way that made working on this project genuinely fun again.
+
+## Testing Infrastructure
+
+Speaking of things I might have skipped—the site has actual test coverage. Vitest handles unit tests for utilities and components, while Playwright runs E2E tests against the running application. The E2E suite covers critical paths like navigation, theme switching, and mobile menu interactions.
+
+```bash
+pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e
+```
+
+That command runs before every commit. It catches issues early and gives me confidence to make changes without worrying about breaking something silently.
+
+## What's Next
+
+The foundation is solid, but there's more I want to add. A proper projects section to showcase work, improved search functionality, and maybe some interactive elements for the technical posts. The monorepo structure makes these additions straightforward—I can build new features in isolation and integrate them when they're ready.
+
+If you're thinking about rebuilding your own site, my advice is to embrace the opportunity to try new tools. The ecosystem has genuinely improved, and there's something energizing about starting fresh with a clean architecture. And if you haven't tried AI-assisted development yet, it's worth experimenting with—not as a replacement for understanding what you're building, but as a way to move faster on the parts that used to slow you down.
+
+The source code is available on [GitHub](https://github.com/BradMcGonigle/website) if you want to dig into the implementation details.
