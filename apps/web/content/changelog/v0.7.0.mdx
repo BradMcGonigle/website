@@ -1,0 +1,22 @@
+---
+version: "0.7.0"
+date: 2026-01-27
+title: Links Collection
+description: Added a Links page to share interesting articles and resources
+tags:
+  - feature
+---
+
+Added a new **Links** section for sharing interesting articles, tools, and resources discovered around the web.
+
+## Links Page
+
+- New `/links` route displaying saved links in a card grid layout
+- Each link shows title, description, image (if available), date, and tags
+- Links open in new tabs and are sorted by date (newest first)
+- Added Links to the site navigation
+
+## Technical Details
+
+- New `links` Velite collection with schema for title, description, url, image, date, and tags
+- New `pages.links-list` package for the links list page component
