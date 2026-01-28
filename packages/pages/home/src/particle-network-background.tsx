@@ -10,10 +10,10 @@ interface Particle {
   radius: number;
 }
 
-const PARTICLE_COUNT = 50;
-const CONNECTION_DISTANCE = 120;
-const PARTICLE_SPEED = 0.3;
-const PARTICLE_RADIUS = 1.5;
+const PARTICLE_COUNT = 60;
+const CONNECTION_DISTANCE = 150;
+const PARTICLE_SPEED = 0.4;
+const PARTICLE_RADIUS = 2;
 
 export function ParticleNetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,7 +41,7 @@ export function ParticleNetworkBackground() {
     const hsl = style.getPropertyValue("--muted-foreground").trim();
     if (!hsl) return "rgba(128, 128, 128, 0.3)";
     const [h, s, l] = hsl.split(" ").map((v) => parseFloat(v));
-    return `hsla(${h}, ${s}%, ${l}%, 0.25)`;
+    return `hsla(${h}, ${s}%, ${l}%, 0.6)`;
   }, []);
 
   useEffect(() => {
@@ -112,11 +112,11 @@ export function ParticleNetworkBackground() {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < CONNECTION_DISTANCE) {
-            const opacity = (1 - distance / CONNECTION_DISTANCE) * 0.15;
+            const opacity = (1 - distance / CONNECTION_DISTANCE) * 0.4;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = color.replace("0.25)", `${opacity})`);
+            ctx.strokeStyle = color.replace("0.6)", `${opacity})`);
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -128,11 +128,11 @@ export function ParticleNetworkBackground() {
         const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
 
         if (mouseDistance < CONNECTION_DISTANCE * 1.5) {
-          const opacity = (1 - mouseDistance / (CONNECTION_DISTANCE * 1.5)) * 0.3;
+          const opacity = (1 - mouseDistance / (CONNECTION_DISTANCE * 1.5)) * 0.5;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = color.replace("0.25)", `${opacity})`);
+          ctx.strokeStyle = color.replace("0.6)", `${opacity})`);
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
@@ -159,7 +159,7 @@ export function ParticleNetworkBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0 opacity-60"
+      className="pointer-events-none fixed inset-0 z-0"
       aria-hidden="true"
     />
   );
