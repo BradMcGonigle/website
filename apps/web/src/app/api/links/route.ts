@@ -61,7 +61,9 @@ function generateSlug(title: string): string {
 }
 
 function generateMdxContent(data: LinkData, imagePath?: string): string {
-  const date = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const date = now.toISOString().split("T")[0];
+  const createdAt = now.toISOString();
   const tags = data.tags && data.tags.length > 0 ? data.tags : [];
 
   let frontmatter = `---
@@ -81,7 +83,8 @@ image: ${imagePath}`;
   }
 
   frontmatter += `
-date: ${date}`;
+date: ${date}
+createdAt: ${createdAt}`;
 
   if (tags.length > 0) {
     frontmatter += `

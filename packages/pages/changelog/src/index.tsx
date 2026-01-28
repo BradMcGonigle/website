@@ -1,6 +1,7 @@
 export interface ChangelogEntry {
   version: string;
   date: string;
+  createdAt: string;
   title: string;
   description?: string | undefined;
   breaking: boolean;
@@ -46,6 +47,9 @@ export default function ChangelogPage({ entries }: ChangelogPageProps) {
     const dateCompare =
       new Date(b.date).getTime() - new Date(a.date).getTime();
     if (dateCompare !== 0) return dateCompare;
+    const createdAtCompare =
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (createdAtCompare !== 0) return createdAtCompare;
     return compareVersions(a.version, b.version);
   });
 

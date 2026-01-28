@@ -5,6 +5,7 @@ export interface Post {
   title: string;
   description: string;
   date: string;
+  createdAt: string;
   updated?: string;
   draft: boolean;
   tags: string[];
@@ -32,6 +33,7 @@ export interface Project {
 export interface ChangelogEntry {
   version: string;
   date: string;
+  createdAt: string;
   title: string;
   description?: string;
   breaking: boolean;
@@ -47,6 +49,7 @@ export interface Link {
   url: string;
   image?: string;
   date: string;
+  createdAt: string;
   tags: string[];
   slug: string;
 }

@@ -6,6 +6,7 @@ export interface Link {
   url: string;
   image?: string;
   date: string;
+  createdAt: string;
   tags: string[];
   slug: string;
 }
@@ -15,9 +16,12 @@ export interface LinksListPageProps {
 }
 
 export default function LinksListPage({ links }: LinksListPageProps) {
-  const sortedLinks = [...links].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedLinks = [...links].sort((a, b) => {
+    const dateCompare =
+      new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
