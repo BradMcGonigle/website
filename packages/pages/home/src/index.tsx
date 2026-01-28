@@ -66,7 +66,7 @@ export default function HomePage({ posts, links }: HomePageProps) {
   return (
     <>
       <DotGridBackground />
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <section aria-labelledby="hero-heading" className="pb-16">
         <AnimatedText
