@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Mail, ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { formatDate } from "utils.core.format";
 import {
   AnimatedSection,
@@ -204,33 +204,6 @@ export default function HomePage({ posts, links }: HomePageProps) {
               </AnimatedListItem>
             ))}
           </AnimatedList>
-        </section>
-      </AnimatedSection>
-
-      {/* Contact Section */}
-      <AnimatedSection delay={0.1}>
-        <section
-          aria-labelledby="contact-heading"
-          className="rounded-2xl bg-accent/50 p-8 text-center sm:p-12"
-        >
-          <h2
-            id="contact-heading"
-            className="text-2xl font-bold sm:text-3xl"
-          >
-            Say Hi!
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-muted-foreground">
-            Or really just anything at all.
-          </p>
-          <div className="mt-6">
-            <a
-              href="mailto:hello@bradmcgonigle.com"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              <Mail className="h-4 w-4" />
-              Send
-            </a>
-          </div>
         </section>
       </AnimatedSection>
     </div>

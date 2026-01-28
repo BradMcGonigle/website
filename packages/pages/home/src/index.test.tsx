@@ -60,13 +60,6 @@ describe("HomePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the contact section", () => {
-    render(<HomePage posts={mockPosts} links={mockLinks} />);
-    expect(
-      screen.getByRole("heading", { name: /Say Hi/i, level: 2 })
-    ).toBeInTheDocument();
-  });
-
   it("renders recent posts", () => {
     render(<HomePage posts={mockPosts} links={mockLinks} />);
     expect(screen.getByText("Test Post")).toBeInTheDocument();
