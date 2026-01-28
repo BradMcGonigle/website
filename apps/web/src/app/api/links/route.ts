@@ -158,7 +158,10 @@ async function commitToGitHub(
   });
 
   if (!repoResponse.ok) {
-    throw new Error(`Failed to get repo info: ${repoResponse.status}`);
+    const errorBody = await repoResponse.text();
+    throw new Error(
+      `Failed to get repo info: ${repoResponse.status} - ${errorBody}`
+    );
   }
 
   const repoInfo = (await repoResponse.json()) as GitHubRepoResponse;
@@ -284,12 +287,16 @@ async function commitToGitHub(
       },
       body: JSON.stringify({
         sha: newCommitData.sha,
+        force: true, // Allow non-fast-forward updates in case of race conditions
       }),
     }
   );
 
   if (!updateRefResponse.ok) {
-    throw new Error(`Failed to update ref: ${updateRefResponse.status}`);
+    const errorBody = await updateRefResponse.text();
+    throw new Error(
+      `Failed to update ref: ${updateRefResponse.status} - ${errorBody}`
+    );
   }
 }
 
