@@ -7,6 +7,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     // Component packages - explicitly list to avoid node_modules scanning
+    "../../packages/components/backgrounds/src/**/*.{ts,tsx}",
     "../../packages/components/design-system/*/src/**/*.{ts,tsx}",
     "../../packages/components/layout/*/src/**/*.{ts,tsx}",
     "../../packages/components/content/*/src/**/*.{ts,tsx}",
