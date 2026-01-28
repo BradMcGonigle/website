@@ -27,21 +27,22 @@ describe("formatCurrency", () => {
 
 describe("formatDate", () => {
   it("formats Date object with default options", () => {
-    const date = new Date("2024-03-15");
+    // Use T12:00:00 to avoid timezone issues shifting the date
+    const date = new Date("2024-03-15T12:00:00");
     expect(formatDate(date)).toBe("March 15, 2024");
   });
 
   it("formats ISO string date", () => {
-    expect(formatDate("2024-12-25")).toBe("December 25, 2024");
+    expect(formatDate("2024-12-25T12:00:00")).toBe("December 25, 2024");
   });
 
   it("formats with custom locale", () => {
-    const date = new Date("2024-03-15");
+    const date = new Date("2024-03-15T12:00:00");
     expect(formatDate(date, "de-DE")).toBe("15. März 2024");
   });
 
   it("formats with custom options", () => {
-    const date = new Date("2024-03-15");
+    const date = new Date("2024-03-15T12:00:00");
     expect(formatDate(date, "en-US", { month: "short", day: "numeric" })).toBe(
       "Mar 15"
     );
