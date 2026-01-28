@@ -61,7 +61,7 @@ function generateSlug(title: string): string {
 }
 
 function generateMdxContent(data: LinkData, imagePath?: string): string {
-  const date = new Date().toISOString().split("T")[0];
+  const date = new Date().toISOString();
   const tags = data.tags && data.tags.length > 0 ? data.tags : [];
 
   let frontmatter = `---
