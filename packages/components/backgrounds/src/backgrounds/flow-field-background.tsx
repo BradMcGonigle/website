@@ -48,6 +48,11 @@ function createNoise() {
   };
 }
 
+interface ParticlePosition {
+  x: number;
+  y: number;
+}
+
 interface Particle {
   x: number;
   y: number;
@@ -55,6 +60,7 @@ interface Particle {
   maxAge: number;
   vx: number;
   vy: number;
+  history: ParticlePosition[];
 }
 
 const PARTICLE_COUNT = 800;
@@ -62,6 +68,7 @@ const NOISE_SCALE = 0.003;
 const SPEED = 0.8;
 const MAX_AGE_BASE = 100;
 const MAX_AGE_VARIANCE = 100;
+const TRAIL_LENGTH = 20;
 
 export function FlowFieldBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -89,13 +96,16 @@ export function FlowFieldBackground() {
   }, [isDarkMode]);
 
   const createParticle = useCallback((width: number, height: number): Particle => {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
     return {
-      x: Math.random() * width,
-      y: Math.random() * height,
+      x,
+      y,
       age: 0,
       maxAge: MAX_AGE_BASE + Math.random() * MAX_AGE_VARIANCE,
       vx: 0,
       vy: 0,
+      history: [{ x, y }],
     };
   }, []);
 
@@ -136,9 +146,8 @@ export function FlowFieldBackground() {
       const time = timeRef.current;
       const opacityMult = getOpacityMultiplier();
 
-      // Fade previous frame instead of clearing for trail effect
-      ctx.fillStyle = "rgba(0, 0, 0, 0.03)";
-      ctx.fillRect(0, 0, width, height);
+      // Clear canvas each frame (transparent background)
+      ctx.clearRect(0, 0, width, height);
 
       // Fade mask from bottom
       const fadeStartY = height * 0.5;
@@ -155,39 +164,53 @@ export function FlowFieldBackground() {
         particle.vx = particle.vx * 0.9 + Math.cos(angle) * SPEED * 0.1;
         particle.vy = particle.vy * 0.9 + Math.sin(angle) * SPEED * 0.1;
 
-        // Store previous position for line drawing
-        const prevX = particle.x;
-        const prevY = particle.y;
-
         // Update position
         particle.x += particle.vx;
         particle.y += particle.vy;
         particle.age++;
 
+        // Add current position to history
+        particle.history.push({ x: particle.x, y: particle.y });
+        if (particle.history.length > TRAIL_LENGTH) {
+          particle.history.shift();
+        }
+
         // Calculate opacity based on age (fade in and out)
         const ageRatio = particle.age / particle.maxAge;
-        let opacity = 1;
+        let baseOpacity = 1;
         if (ageRatio < 0.1) {
-          opacity = ageRatio / 0.1;
+          baseOpacity = ageRatio / 0.1;
         } else if (ageRatio > 0.8) {
-          opacity = (1 - ageRatio) / 0.2;
+          baseOpacity = (1 - ageRatio) / 0.2;
         }
 
-        // Apply vertical fade
-        if (particle.y > fadeStartY) {
-          const fadeFactor = 1 - (particle.y - fadeStartY) / (fadeEndY - fadeStartY);
-          opacity *= Math.max(0, fadeFactor);
-        }
+        // Draw trail from history
+        if (particle.history.length > 1) {
+          for (let i = 1; i < particle.history.length; i++) {
+            const prev = particle.history[i - 1];
+            const curr = particle.history[i];
+            if (!prev || !curr) continue;
 
-        // Draw particle trail
-        const finalOpacity = opacity * 0.21 * opacityMult;
-        if (finalOpacity > 0.01) {
-          ctx.beginPath();
-          ctx.moveTo(prevX, prevY);
-          ctx.lineTo(particle.x, particle.y);
-          ctx.strokeStyle = `hsla(${color.h}, ${color.s}%, ${color.l}%, ${finalOpacity})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
+            // Trail fades toward the tail
+            const trailRatio = i / particle.history.length;
+            let opacity = baseOpacity * trailRatio;
+
+            // Apply vertical fade
+            if (curr.y > fadeStartY) {
+              const fadeFactor = 1 - (curr.y - fadeStartY) / (fadeEndY - fadeStartY);
+              opacity *= Math.max(0, fadeFactor);
+            }
+
+            const finalOpacity = opacity * 0.21 * opacityMult;
+            if (finalOpacity > 0.01) {
+              ctx.beginPath();
+              ctx.moveTo(prev.x, prev.y);
+              ctx.lineTo(curr.x, curr.y);
+              ctx.strokeStyle = `hsla(${color.h}, ${color.s}%, ${color.l}%, ${finalOpacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
         }
 
         // Reset particle if it's too old or out of bounds
@@ -205,6 +228,7 @@ export function FlowFieldBackground() {
           particle.maxAge = newParticle.maxAge;
           particle.vx = 0;
           particle.vy = 0;
+          particle.history = [{ x: particle.x, y: particle.y }];
         }
       }
 
