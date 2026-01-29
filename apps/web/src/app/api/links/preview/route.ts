@@ -87,28 +87,64 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
   const videoId = extractYouTubeVideoId(url);
   const images = videoId ? getYouTubeThumbnails(videoId) : [];
 
-  // Use YouTube oEmbed API to get video title and author
+  let title = "";
+  let description = "";
+
+  // Use YouTube oEmbed API to get video title
   const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url.href)}&format=json`;
 
   try {
     const response = await fetch(oembedUrl);
     if (response.ok) {
       const data = (await response.json()) as YouTubeOEmbedResponse;
-      return {
-        title: data.title ?? "",
-        description: data.author_name ? `By ${data.author_name}` : "",
-        images,
-        url: url.href,
-      };
+      title = data.title ?? "";
     }
   } catch {
-    // Fall through to default response
+    // Continue to try fetching the page
   }
 
-  // Fallback if oEmbed fails
+  // Fetch the YouTube page to get the description from meta tags
+  try {
+    const pageResponse = await fetch(url.href, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+      },
+    });
+
+    if (pageResponse.ok) {
+      const html = await pageResponse.text();
+
+      // Extract description from meta tags
+      const ogDescription = getMetaContent(html, 'property="og:description"');
+      const metaDescription = getMetaContent(html, 'name="description"');
+      const rawDescription = ogDescription ?? metaDescription ?? "";
+
+      // Truncate description if too long (max 300 chars)
+      if (rawDescription.length > 300) {
+        description = decodeHtmlEntities(
+          rawDescription.slice(0, 297).trim() + "..."
+        );
+      } else {
+        description = decodeHtmlEntities(rawDescription.trim());
+      }
+
+      // If we didn't get title from oEmbed, try meta tags
+      if (!title) {
+        const ogTitle = getMetaContent(html, 'property="og:title"');
+        title = ogTitle ? decodeHtmlEntities(ogTitle.trim()) : "";
+      }
+    }
+  } catch {
+    // Continue with whatever we have
+  }
+
   return {
-    title: "",
-    description: "",
+    title,
+    description,
     images,
     url: url.href,
   };
