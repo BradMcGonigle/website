@@ -176,18 +176,13 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
     if (pageResponse.ok) {
       const html = await pageResponse.text();
 
-      // Use a more robust regex for twitter:description that handles apostrophes
-      // Match content wrapped in double quotes (most common)
-      const twitterDescMatch =
-        /<meta[^>]+name=["']twitter:description["'][^>]+content="([^"]*)"/.exec(
-          html
-        ) ??
-        /<meta[^>]+content="([^"]*)"[^>]+name=["']twitter:description["']/.exec(
-          html
-        );
+      // Try multiple sources for description, in order of preference
+      const twitterDesc = getMetaContent(html, 'name="twitter:description"');
+      const ogDesc = getMetaContent(html, 'property="og:description"');
+      const metaDesc = getMetaContent(html, 'name="description"');
+      const rawDescription = twitterDesc ?? ogDesc ?? metaDesc;
 
-      if (twitterDescMatch?.[1]) {
-        const rawDescription = twitterDescMatch[1];
+      if (rawDescription) {
         // Skip generic YouTube description
         if (!rawDescription.includes("Enjoy the videos and music you love")) {
           if (rawDescription.length > 300) {
