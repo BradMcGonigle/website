@@ -15,16 +15,18 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {},
+    "lint": {
+      "outputs": []
+    },
     "test": {
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "test:e2e": {
       "dependsOn": ["build"],
       "outputs": ["playwright-report/**", "e2e-results/**"]
     },
     "typecheck": {
-      "outputs": ["*.tsbuildinfo"]
+      "outputs": []
     },
     "clean": {
       "cache": false
