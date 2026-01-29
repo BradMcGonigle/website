@@ -148,17 +148,17 @@ const companies: Company[] = [
 const skillCategories: SkillCategory[] = [
   {
     name: "Languages",
-    skills: ["TypeScript", "JavaScript", "GraphQL"],
+    skills: ["TypeScript", "JavaScript", "GraphQL", "HTML", "CSS"],
   },
   {
     name: "Frameworks & Libraries",
     skills: [
-      "React 18/19",
-      "Next.js (App Router)",
-      "Server Components",
-      "Tailwind CSS",
-      "CVA",
+      "React",
+      "Next.js",
       "Apollo Client",
+      "TanStack Query",
+      "Tailwind CSS",
+      "i18next",
     ],
   },
   {
@@ -167,18 +167,28 @@ const skillCategories: SkillCategory[] = [
       "Monorepo Architecture",
       "Turborepo",
       "pnpm",
-      "CI/CD (Codefresh)",
       "Docker",
-      "Fastly CDN",
+      "Kubernetes",
+      "AWS",
+      "Terraform",
+      "Vercel",
     ],
   },
   {
-    name: "Testing",
-    skills: ["Vitest", "Playwright", "Chromatic", "Testing Library", "Maestro"],
+    name: "Build & CI/CD",
+    skills: ["Vite", "Webpack", "GitHub Actions", "CircleCI"],
+  },
+  {
+    name: "Testing & Quality",
+    skills: ["Vitest", "Playwright", "Chromatic", "Testing Library"],
   },
   {
     name: "Observability",
     skills: ["Datadog RUM", "APM", "Error Tracking", "Synthetics"],
+  },
+  {
+    name: "Design Systems",
+    skills: ["Storybook", "Figma"],
   },
 ];
 
