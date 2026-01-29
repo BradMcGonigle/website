@@ -19,6 +19,11 @@ interface RequestBody {
   url?: string;
 }
 
+interface YouTubeOEmbedResponse {
+  title?: string;
+  author_name?: string;
+  thumbnail_url?: string;
+}
 
 function getClientIdentifier(request: NextRequest): string {
   // Use API key as identifier since all requests are authenticated
@@ -71,6 +76,12 @@ export async function POST(request: NextRequest) {
 
     // Parse URL after validation
     const parsedUrl = new URL(url);
+
+    // For YouTube URLs, use oEmbed API for better metadata
+    if (isYouTubeUrl(parsedUrl)) {
+      const metadata = await fetchYouTubeMetadata(parsedUrl);
+      return NextResponse.json(metadata);
+    }
 
     // Fetch the page with timeout
     const controller = new AbortController();
@@ -126,6 +137,85 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
+  const videoId = extractYouTubeVideoId(url);
+  const images = videoId ? getYouTubeThumbnails(videoId) : [];
+
+  let title = "";
+  let description = "";
+  let authorName = "";
+
+  // Use YouTube oEmbed API to get video title and author
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url.href)}&format=json`;
+
+  try {
+    const response = await fetch(oembedUrl);
+    if (response.ok) {
+      const data = (await response.json()) as YouTubeOEmbedResponse;
+      title = data.title ?? "";
+      authorName = data.author_name ?? "";
+    }
+  } catch {
+    // Continue to try fetching the page
+  }
+
+  // Fetch the YouTube page to get the description from twitter:description
+  try {
+    const pageResponse = await fetch(url.href, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+      },
+    });
+
+    if (pageResponse.ok) {
+      const html = await pageResponse.text();
+
+      // Try multiple sources for description, in order of preference
+      const twitterDesc = getMetaContent(html, 'name="twitter:description"');
+      const ogDesc = getMetaContent(html, 'property="og:description"');
+      const metaDesc = getMetaContent(html, 'name="description"');
+      const rawDescription = twitterDesc ?? ogDesc ?? metaDesc;
+
+      if (rawDescription) {
+        // Skip generic YouTube description
+        if (!rawDescription.includes("Enjoy the videos and music you love")) {
+          if (rawDescription.length > 300) {
+            description = decodeHtmlEntities(
+              rawDescription.slice(0, 297).trim() + "..."
+            );
+          } else {
+            description = decodeHtmlEntities(rawDescription.trim());
+          }
+        }
+      }
+
+      // If we didn't get title from oEmbed, try meta tags
+      if (!title) {
+        const ogTitle = getMetaContent(html, 'property="og:title"');
+        title = ogTitle ? decodeHtmlEntities(ogTitle.trim()) : "";
+      }
+    }
+  } catch {
+    // Continue with whatever we have
+  }
+
+  // Fallback: use author/channel name if no description found
+  if (!description && authorName) {
+    description = `By ${authorName}`;
+  }
+
+  return {
+    title,
+    description,
+    images,
+    url: url.href,
+  };
 }
 
 function extractMetadata(html: string, baseUrl: URL): PageMetadata {
@@ -228,4 +318,62 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ");
+}
+
+function isYouTubeUrl(url: URL): boolean {
+  const hostname = url.hostname.toLowerCase();
+  return (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "youtu.be" ||
+    hostname === "m.youtube.com"
+  );
+}
+
+function extractYouTubeVideoId(url: URL): string | null {
+  const hostname = url.hostname.toLowerCase();
+
+  // Handle youtu.be short URLs
+  if (hostname === "youtu.be") {
+    const videoId = url.pathname.slice(1).split("/")[0];
+    if (!videoId) return null;
+    return videoId;
+  }
+
+  // Handle youtube.com URLs
+  if (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "m.youtube.com"
+  ) {
+    // /watch?v=VIDEO_ID
+    const vParam = url.searchParams.get("v");
+    if (vParam) {
+      return vParam;
+    }
+
+    // /embed/VIDEO_ID or /v/VIDEO_ID
+    const pathMatch = /^\/(embed|v)\/([^/?]+)/.exec(url.pathname);
+    if (pathMatch?.[2]) {
+      return pathMatch[2];
+    }
+
+    // /shorts/VIDEO_ID
+    const shortsMatch = /^\/shorts\/([^/?]+)/.exec(url.pathname);
+    if (shortsMatch?.[1]) {
+      return shortsMatch[1];
+    }
+  }
+
+  return null;
+}
+
+function getYouTubeThumbnails(videoId: string): string[] {
+  // Return multiple thumbnail options in order of quality (highest first)
+  return [
+    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+  ];
 }
