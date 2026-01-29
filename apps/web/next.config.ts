@@ -65,6 +65,17 @@ const config: NextConfig = {
       },
     ];
   },
+
+  redirects() {
+    return [
+      {
+        // Redirect old Gatsby tag pages to links
+        source: "/tag/:slug",
+        destination: "/links",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default config;
