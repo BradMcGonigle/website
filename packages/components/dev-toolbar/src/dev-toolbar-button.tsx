@@ -3,7 +3,10 @@
 import type { ReactNode, CSSProperties } from "react";
 
 interface DevToolbarButtonProps {
-  children: ReactNode;
+  /** Text label for the button */
+  children?: ReactNode;
+  /** Icon element to display */
+  icon?: ReactNode;
   onClick?: () => void;
   href?: string;
   active?: boolean;
@@ -11,7 +14,7 @@ interface DevToolbarButtonProps {
 }
 
 const baseStyle: CSSProperties = {
-  padding: "3px 8px",
+  padding: "3px 6px",
   border: "none",
   borderRadius: 4,
   cursor: "pointer",
@@ -22,6 +25,9 @@ const baseStyle: CSSProperties = {
   transition: "all 0.1s ease",
   textDecoration: "none",
   fontFamily: "inherit",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
 };
 
 const activeStyle: CSSProperties = {
@@ -31,12 +37,16 @@ const activeStyle: CSSProperties = {
   color: "rgba(0, 0, 0, 0.9)",
 };
 
+const BUTTON_TEXT_CLASS = "dev-toolbar-btn-text";
+
 /**
  * Button/link component for the dev toolbar.
  * Can be used as a button (onClick) or link (href).
+ * Supports icons that remain visible on mobile while text is hidden.
  */
 export function DevToolbarButton({
   children,
+  icon,
   onClick,
   href,
   active = false,
@@ -56,6 +66,27 @@ export function DevToolbarButton({
     }
   };
 
+  const content = (
+    <>
+      {icon && <span style={{ display: "flex", alignItems: "center" }}>{icon}</span>}
+      {children && (
+        <>
+          <style>{`
+            .${BUTTON_TEXT_CLASS} {
+              display: none;
+            }
+            @media (min-width: 640px) {
+              .${BUTTON_TEXT_CLASS} {
+                display: inline;
+              }
+            }
+          `}</style>
+          <span className={BUTTON_TEXT_CLASS}>{children}</span>
+        </>
+      )}
+    </>
+  );
+
   if (href) {
     return (
       <a
@@ -65,7 +96,7 @@ export function DevToolbarButton({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {children}
+        {content}
       </a>
     );
   }
@@ -78,7 +109,7 @@ export function DevToolbarButton({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {children}
+      {content}
     </button>
   );
 }

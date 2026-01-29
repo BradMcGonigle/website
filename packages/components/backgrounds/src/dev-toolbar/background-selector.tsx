@@ -1,10 +1,12 @@
 "use client";
 
+import type { ChangeEvent } from "react";
 import { useBackground } from "../hooks/use-background";
+import type { BackgroundId } from "../types";
 
 /**
- * Background selector buttons for use in the dev toolbar.
- * Displays all available backgrounds with the current one highlighted.
+ * Background selector dropdown for use in the dev toolbar.
+ * Compact dropdown that works well on both mobile and desktop.
  */
 export function BackgroundSelector() {
   const { currentBackground, backgrounds, setBackground } = useBackground();
@@ -13,40 +15,34 @@ export function BackgroundSelector() {
     return null;
   }
 
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setBackground(e.target.value as BackgroundId);
+  };
+
   return (
-    <>
-      {backgrounds.map((bg, index) => (
-        <button
-          key={bg.id}
-          onClick={() => setBackground(bg.id)}
-          style={{
-            padding: "3px 8px",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-            fontSize: 11,
-            fontWeight: currentBackground === bg.id ? 600 : 500,
-            background: currentBackground === bg.id ? "rgba(0, 0, 0, 0.15)" : "transparent",
-            color: currentBackground === bg.id ? "rgba(0, 0, 0, 0.9)" : "rgba(0, 0, 0, 0.6)",
-            transition: "all 0.1s ease",
-            marginLeft: index > 0 ? 2 : 0,
-            fontFamily: "inherit",
-          }}
-          title={bg.description}
-          onMouseEnter={(e) => {
-            if (currentBackground !== bg.id) {
-              e.currentTarget.style.background = "rgba(0, 0, 0, 0.08)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (currentBackground !== bg.id) {
-              e.currentTarget.style.background = "transparent";
-            }
-          }}
-        >
+    <select
+      value={currentBackground}
+      onChange={handleChange}
+      style={{
+        padding: "2px 4px",
+        border: "none",
+        borderRadius: 4,
+        cursor: "pointer",
+        fontSize: 11,
+        fontWeight: 500,
+        background: "rgba(0, 0, 0, 0.1)",
+        color: "rgba(0, 0, 0, 0.8)",
+        fontFamily: "inherit",
+        outline: "none",
+        minWidth: 80,
+      }}
+      title="Select background"
+    >
+      {backgrounds.map((bg) => (
+        <option key={bg.id} value={bg.id}>
           {bg.name}
-        </button>
+        </option>
       ))}
-    </>
+    </select>
   );
 }

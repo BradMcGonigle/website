@@ -7,13 +7,11 @@ interface DevToolbarProps {
   children: ReactNode;
 }
 
-const TOOLBAR_ID = "dev-toolbar";
-
 /**
  * Development toolbar container.
  * Mimics Arc Browser's developer mode bar.
  * Renders in development mode OR in production when authenticated with Vercel.
- * Hidden on mobile devices (< 768px).
+ * Responsive design that works on both mobile and desktop.
  */
 export function DevToolbar({ children }: DevToolbarProps) {
   const isVercelAuthenticated = useVercelAuth();
@@ -26,49 +24,38 @@ export function DevToolbar({ children }: DevToolbarProps) {
   }
 
   return (
-    <>
-      <style>{`
-        #${TOOLBAR_ID} {
-          display: none;
-        }
-        @media (min-width: 768px) {
-          #${TOOLBAR_ID} {
-            display: flex;
-          }
-        }
-      `}</style>
-      <div
-        id={TOOLBAR_ID}
+    <div
+      style={{
+        width: "100%",
+        height: 28,
+        background: "linear-gradient(90deg, #FF9500 0%, #FFCC00 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 4,
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontSize: 12,
+        fontWeight: 500,
+        color: "rgba(0, 0, 0, 0.8)",
+        zIndex: 9999,
+        position: "relative",
+        padding: "0 8px",
+      }}
+    >
+      <span
         style={{
-          width: "100%",
-          height: 28,
-          background: "linear-gradient(90deg, #FF9500 0%, #FFCC00 100%)",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 2,
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          fontSize: 12,
-          fontWeight: 500,
-          color: "rgba(0, 0, 0, 0.8)",
-          zIndex: 9999,
-          position: "relative",
+          opacity: 0.6,
+          marginRight: 4,
+          fontSize: 11,
+          textTransform: "uppercase",
+          letterSpacing: "0.5px",
         }}
       >
-        <span
-          style={{
-            opacity: 0.6,
-            marginRight: 8,
-            fontSize: 11,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          Dev
-        </span>
-        <DevToolbarDivider />
-        {children}
-      </div>
-    </>
+        Dev
+      </span>
+      <DevToolbarDivider />
+      {children}
+    </div>
   );
 }
 
