@@ -1,5 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+  validateUrlForSSRF,
+  checkRateLimit,
+  RATE_LIMITS,
+  sanitizeForYaml,
+  MAX_IMAGE_SIZE,
+  REQUEST_TIMEOUT,
+  isValidApiKeyFromRequest,
+} from "@/lib/security";
 
 interface LinkData {
   title: string;
@@ -42,14 +51,17 @@ interface FileToCommit {
   content: string | Buffer;
 }
 
-function isValidApiKey(request: NextRequest): boolean {
-  const apiKey = process.env.LINKS_API_KEY;
-  if (!apiKey) return false;
 
+function getClientIdentifier(request: NextRequest): string {
+  // Use API key as identifier since all requests are authenticated
   const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) return false;
-
-  return authHeader.slice(7) === apiKey;
+  if (authHeader?.startsWith("Bearer ")) {
+    return `apikey:${authHeader.slice(7).slice(0, 8)}`; // Use first 8 chars
+  }
+  // Fallback to IP
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() ?? "unknown";
+  return `ip:${ip}`;
 }
 
 function generateSlug(title: string): string {
@@ -66,12 +78,13 @@ function generateMdxContent(data: LinkData, imagePath?: string): string {
   const createdAt = now.toISOString();
   const tags = data.tags && data.tags.length > 0 ? data.tags : [];
 
+  // Use sanitizeForYaml to properly escape all special characters
   let frontmatter = `---
-title: "${data.title.replace(/"/g, '\\"')}"`;
+title: "${sanitizeForYaml(data.title)}"`;
 
   if (data.description) {
     frontmatter += `
-description: "${data.description.replace(/"/g, '\\"')}"`;
+description: "${sanitizeForYaml(data.description)}"`;
   }
 
   frontmatter += `
@@ -89,7 +102,7 @@ createdAt: ${createdAt}`;
   if (tags.length > 0) {
     frontmatter += `
 tags:
-${tags.map((tag) => `  - ${tag}`).join("\n")}`;
+${tags.map((tag) => `  - ${sanitizeForYaml(tag)}`).join("\n")}`;
   }
 
   frontmatter += `
@@ -100,19 +113,78 @@ ${tags.map((tag) => `  - ${tag}`).join("\n")}`;
 }
 
 async function downloadImage(imageUrl: string): Promise<Buffer | null> {
+  // Validate URL before downloading
+  const urlValidation = validateUrlForSSRF(imageUrl);
+  if (!urlValidation.isValid) {
+    console.warn(`Blocked image download from ${imageUrl}: ${urlValidation.error}`);
+    return null;
+  }
+
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
     const response = await fetch(imageUrl, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (compatible; LinkSaver/1.0; +https://bradmcgonigle.com)",
       },
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) return null;
 
-    const arrayBuffer = await response.arrayBuffer();
-    return Buffer.from(arrayBuffer);
-  } catch {
+    // Check Content-Length header for size limit
+    const contentLength = response.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE) {
+      console.warn(`Image too large: ${contentLength} bytes (max: ${MAX_IMAGE_SIZE})`);
+      return null;
+    }
+
+    // Verify it's actually an image
+    const contentType = response.headers.get("content-type");
+    if (contentType && !contentType.startsWith("image/")) {
+      console.warn(`Invalid content type for image: ${contentType}`);
+      return null;
+    }
+
+    // Check final URL after redirects for SSRF
+    const finalUrlValidation = validateUrlForSSRF(response.url);
+    if (!finalUrlValidation.isValid) {
+      console.warn(`Image redirected to blocked URL: ${response.url}`);
+      return null;
+    }
+
+    // Stream the response and enforce size limit
+    const chunks: Uint8Array[] = [];
+    let totalSize = 0;
+
+    const reader = response.body?.getReader();
+    if (!reader) return null;
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalSize += value.length;
+      if (totalSize > MAX_IMAGE_SIZE) {
+        void reader.cancel();
+        console.warn(`Image exceeded size limit during download: ${totalSize} bytes`);
+        return null;
+      }
+
+      chunks.push(value);
+    }
+
+    const buffer = Buffer.concat(chunks);
+    return buffer;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      console.warn(`Image download timed out: ${imageUrl}`);
+    }
     return null;
   }
 }
@@ -278,7 +350,7 @@ async function commitToGitHub(
   const newCommitData =
     (await newCommitResponse.json()) as GitHubNewCommitResponse;
 
-  // Update the ref
+  // Update the ref (without force push to prevent data loss)
   const updateRefResponse = await fetch(
     `${baseUrl}/git/refs/heads/${defaultBranch}`,
     {
@@ -290,7 +362,7 @@ async function commitToGitHub(
       },
       body: JSON.stringify({
         sha: newCommitData.sha,
-        force: true, // Allow non-fast-forward updates in case of race conditions
+        force: false, // Disabled force push for safety
       }),
     }
   );
@@ -304,8 +376,23 @@ async function commitToGitHub(
 }
 
 export async function POST(request: NextRequest) {
-  if (!isValidApiKey(request)) {
+  if (!isValidApiKeyFromRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limiting
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(clientId, RATE_LIMITS.create);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rateLimit.retryAfter ?? 60),
+        },
+      }
+    );
   }
 
   try {
@@ -314,6 +401,15 @@ export async function POST(request: NextRequest) {
     if (!data.title || !data.url) {
       return NextResponse.json(
         { error: "Title and URL are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate the main URL
+    const urlValidation = validateUrlForSSRF(data.url);
+    if (!urlValidation.isValid) {
+      return NextResponse.json(
+        { error: urlValidation.error ?? "Invalid URL" },
         { status: 400 }
       );
     }
