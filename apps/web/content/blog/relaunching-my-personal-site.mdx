@@ -71,15 +71,15 @@ If I add a blog post with a malformed date or missing title, the build fails. Th
 
 ## Canvas Animations: Why Not Just Use CSS?
 
-The background features two canvas-based animations that rotate every 8 hours—a dot grid with a pulsing effect and topographic contour lines.
+The site features seven canvas-based background animations that rotate every 8 hours: a pulsing dot grid, topographic contour lines, a particle flow field, a constellation with twinkling stars, wave interference patterns, an aurora borealis effect, and an animated Voronoi diagram.
 
-CSS animations would have been simpler for the dot grid. I chose canvas for a few reasons: I wanted both backgrounds to use the same rendering approach for consistency, the topographic animation requires per-pixel control that CSS can't provide, and I hadn't written canvas code in years and wanted to revisit it.
+CSS animations would have been simpler for some of these—the dot grid, for instance, could probably be achieved with CSS. I chose canvas for a few reasons: I wanted all backgrounds to use the same rendering approach for consistency, several effects require per-pixel control that CSS can't provide, and I hadn't written canvas code in years and wanted to revisit it.
 
-The topographic background uses Perlin noise to generate a height field, then marching squares to extract contour lines at fixed intervals. Marching squares is a standard algorithm for finding isolines in a scalar field—you divide the space into cells, classify each cell based on which corners are above or below the threshold, then draw the appropriate line segment. It's the same technique used in everything from terrain rendering to medical imaging.
+The more complex backgrounds involve algorithms I found interesting to implement. The topographic background uses Perlin noise to generate a height field, then marching squares to extract contour lines—the same technique used in terrain rendering and medical imaging. The Voronoi background implements Fortune's algorithm for the cell computation, and the flow field uses curl noise for particle trajectories.
 
-Performance was a concern. Both animations target 30fps and use `requestAnimationFrame` with frame skipping if the browser is under load. The dot grid redraws only the dots whose opacity has changed since the last frame. On my test devices, the animations use less than 2% CPU when visible and pause entirely when the tab is backgrounded.
+Performance was a concern with seven different animations. All target 30fps and use `requestAnimationFrame` with frame skipping if the browser is under load. Each animation is optimized differently—the dot grid only redraws dots whose opacity has changed, while the flow field recycles particles that drift off-screen rather than creating new objects. On my test devices, the animations use less than 2% CPU when visible and pause entirely when the tab is backgrounded.
 
-The bundle cost is roughly 4KB gzipped for both animations. Framer Motion would have added ~25KB for arguably simpler code. Whether that trade-off is correct depends on your priorities—I valued the smaller bundle and the learning experience.
+The bundle cost is roughly 12KB gzipped for all seven animations. Framer Motion would have added ~25KB for arguably simpler code, though it wouldn't easily handle the algorithmic effects. Whether that trade-off is correct depends on your priorities—I valued the smaller bundle and the learning experience.
 
 ## Dark Mode Implementation
 
@@ -148,7 +148,7 @@ What's not tested: visual appearance. I don't have visual regression tests, whic
 
 **Skip the custom animations initially.** They were fun to build but consumed time that could have gone toward content. If I were advising someone else, I'd suggest launching with a minimal design and adding polish later.
 
-**Write more content before building.** I spent weeks on infrastructure for a site with seven blog posts. The build system is ready for hundreds of posts that don't exist yet. Starting with a backlog of content would have clarified which features actually mattered.
+**Write more content before building.** I spent weeks on infrastructure for a site with eight blog posts. The build system is ready for hundreds of posts that don't exist yet. Starting with a backlog of content would have clarified which features actually mattered.
 
 ## Performance
 
