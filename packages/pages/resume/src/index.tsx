@@ -42,7 +42,6 @@ const companies: Company[] = [
         startDate: "Dec 2021",
         endDate: "Feb 2024",
         description: [
-          "Led Auth0 to Descope authentication migration using parallel implementation strategy with feature flag-controlled rollout",
           "Introduced Playwright E2E testing framework and Chromatic visual regression testing, establishing deployment confidence across the organization",
           "Migrated observability stack to DataDog (RUM, APM, error tracking), improving production debugging capabilities",
           "Drove styled-components to Tailwind CSS migration, establishing modern styling patterns adopted org-wide",
