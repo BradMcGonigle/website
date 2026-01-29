@@ -63,10 +63,10 @@ describe("TopographicBackground", () => {
     expect(canvas).toHaveClass("inset-0");
   });
 
-  it("has z-0 for proper stacking", () => {
+  it("has -z-10 for proper stacking behind content", () => {
     render(<TopographicBackground />);
     const canvas = document.querySelector("canvas");
-    expect(canvas).toHaveClass("z-0");
+    expect(canvas).toHaveClass("-z-10");
   });
 
   it("gets 2d context from canvas", () => {

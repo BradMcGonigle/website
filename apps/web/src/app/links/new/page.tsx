@@ -18,6 +18,7 @@ function NewLinkForm() {
   const searchParams = useSearchParams();
   const [apiKey, setApiKey] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [url, setUrl] = useState("");
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [title, setTitle] = useState("");
@@ -28,14 +29,32 @@ function NewLinkForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
-  // Check for stored API key on mount
+  // Check for existing auth on mount by making a test request
   useEffect(() => {
-    const storedKey = localStorage.getItem("links_api_key");
-    if (storedKey) {
-      setApiKey(storedKey);
-      setIsAuthenticated(true);
-    }
+    const checkAuth = async () => {
+      try {
+        // Try to make an authenticated request to check if we have a valid cookie
+        const response = await fetch("/api/links/preview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: "https://example.com" }),
+          credentials: "include",
+        });
+
+        // If we don't get a 401, we're authenticated
+        if (response.status !== 401) {
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Ignore errors, user is not authenticated
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    void checkAuth();
   }, []);
 
   // Check for URL in query params (from bookmarklet)
@@ -46,17 +65,45 @@ function NewLinkForm() {
     }
   }, [searchParams, isAuthenticated]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (apiKey.trim()) {
-      localStorage.setItem("links_api_key", apiKey.trim());
+    if (!apiKey.trim()) return;
+
+    setAuthLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/links/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: apiKey.trim() }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as ErrorResponse;
+        throw new Error(errorData.error ?? "Authentication failed");
+      }
+
       setIsAuthenticated(true);
+      setApiKey(""); // Clear the input for security
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("links_api_key");
-    setApiKey("");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/links/auth", {
+        method: "DELETE",
+        credentials: "include",
+      });
+    } catch {
+      // Ignore errors
+    }
+
     setIsAuthenticated(false);
     setPreview(null);
     setUrl("");
@@ -72,12 +119,15 @@ function NewLinkForm() {
     try {
       const response = await fetch("/api/links/preview", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),
+        credentials: "include", // Include cookies for authentication
       });
+
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+        throw new Error("Session expired. Please log in again.");
+      }
 
       if (!response.ok) {
         const errorData = (await response.json()) as ErrorResponse;
@@ -97,7 +147,7 @@ function NewLinkForm() {
     } finally {
       setLoading(false);
     }
-  }, [url, apiKey]);
+  }, [url]);
 
   // Auto-fetch preview when URL is set from query param
   useEffect(() => {
@@ -117,10 +167,7 @@ function NewLinkForm() {
     try {
       const response = await fetch("/api/links", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim() || undefined,
@@ -131,7 +178,13 @@ function NewLinkForm() {
             .map((t) => t.trim())
             .filter(Boolean),
         }),
+        credentials: "include", // Include cookies for authentication
       });
+
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+        throw new Error("Session expired. Please log in again.");
+      }
 
       if (!response.ok) {
         const errorData = (await response.json()) as ErrorResponse;
@@ -153,9 +206,22 @@ function NewLinkForm() {
     }
   };
 
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-gray-500">Checking authentication...</div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <form onSubmit={handleLogin} className="space-y-4">
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+          </div>
+        )}
         <div>
           <label
             htmlFor="apiKey"
@@ -171,13 +237,15 @@ function NewLinkForm() {
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
             placeholder="Enter your API key"
             required
+            autoComplete="current-password"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          disabled={authLoading}
+          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
         >
-          Login
+          {authLoading ? "Logging in..." : "Login"}
         </button>
       </form>
     );

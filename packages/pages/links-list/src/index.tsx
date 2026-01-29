@@ -43,7 +43,7 @@ export default function LinksListPage({ links }: LinksListPageProps) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block h-full overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary"
+                className="group relative isolate block h-full overflow-hidden rounded-lg border border-border backdrop-blur-[2px] transition-colors hover:border-primary"
               >
                 {link.image && (
                   <div className="aspect-[2/1] overflow-hidden bg-muted">

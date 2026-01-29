@@ -28,11 +28,13 @@ const companies: Company[] = [
         startDate: "Feb 2024",
         endDate: "Present",
         description: [
-          "Architect and scale GoodRx's design system, empowering developers with documented, reusable components across the frontend organization",
-          "Lead the application configuration platform and UI, enabling advanced feature configuration variations across all frontend applications",
-          "Design and implement CI/CD pipelines for the GoodRx monorepo, including build package versioning, changelogs via changesets, and artifact registry",
-          "Establish governance for docs-as-code component documentation system, enforcing ownership standards and managing contributions",
-          "Partner with SRE and backend teams to plan and implement infrastructure changes across providers",
+          "Led pnpm + Turborepo migration from Yarn + Lerna, reducing node_modules disk usage by 70% and CI pipeline times from 30+ minutes to ~10 minutes",
+          "Architected transition from Babel to SWC, cutting full build times by 60% and enabling sub-2-minute incremental builds",
+          "Drove Next.js 15 and React 19 adoption across 6 production applications serving GoodRx's primary consumer web properties",
+          "Designed and scaled GoodRx's internal design system (300+ packages), replacing external dependencies with in-repo solutions using Tailwind CSS and CVA",
+          "Established multi-tenant platform architecture enabling rapid onboarding of retail pharmacy partners including Kroger, Giant Eagle, and Wegmans",
+          "Lead application configuration platform powering feature variations and A/B testing across all frontend applications",
+          "Partner with SRE, backend, and product teams to define technical roadmaps and drive infrastructure modernization",
         ],
       },
       {
@@ -40,9 +42,10 @@ const companies: Company[] = [
         startDate: "Dec 2021",
         endDate: "Feb 2024",
         description: [
-          "Implemented and maintained comprehensive testing practices including testing-library/react and mobile data-driven testing with Maestro",
+          "Introduced Playwright E2E testing framework and Chromatic visual regression testing, establishing deployment confidence across the organization",
+          "Migrated observability stack to DataDog (RUM, APM, error tracking), improving production debugging capabilities",
+          "Drove styled-components to Tailwind CSS migration, establishing modern styling patterns adopted org-wide",
           "Led incident management through production deployments, coordinating cross-team communication and root cause analysis",
-          "Championed developer experience improvements through accelerating application platform efficiency and optimizing monorepo pipelines",
         ],
       },
       {
@@ -50,9 +53,10 @@ const companies: Company[] = [
         startDate: "Oct 2019",
         endDate: "Dec 2021",
         description: [
-          "Optimized application performance using React optimization strategies and Datadog observability",
-          "Set the engineering vision for developer accessibility, automated testing, documentation, and build pipelines",
-          "Led the evolution of engineering documentation by partnering with Design and Product teams",
+          "Core contributor to Singularity monorepo transformation from single-app repo to GoodRx's primary frontend platform",
+          "Created next-web application which became the primary Next.js application serving goodrx.com",
+          "Set engineering vision for developer accessibility, automated testing, documentation, and build pipeline standards",
+          "Led evolution of engineering documentation partnering with Design and Product teams",
         ],
       },
     ],
@@ -144,40 +148,67 @@ const companies: Company[] = [
 const skillCategories: SkillCategory[] = [
   {
     name: "Languages",
-    skills: ["TypeScript", "JavaScript"],
+    skills: ["TypeScript", "JavaScript", "GraphQL", "HTML", "CSS"],
   },
   {
     name: "Frameworks & Libraries",
     skills: [
       "React",
       "Next.js",
-      "Gatsby",
-      "Redux",
+      "Server Components",
+      "Apollo Client",
+      "TanStack Query",
+      "Zustand",
       "Tailwind CSS",
-      "styled-components",
-      "Emotion",
+      "CVA",
+      "i18next",
     ],
   },
   {
-    name: "Tools & Platforms",
+    name: "Platform & Infrastructure",
     skills: [
-      "Node.js",
-      "GraphQL",
-      "Storybook",
+      "Monorepo Architecture",
       "Turborepo",
       "pnpm",
-      "Git",
+      "Node.js",
       "Docker",
-      "CI/CD",
+      "Kubernetes",
+      "AWS",
+      "Terraform",
+      "Vercel",
     ],
   },
   {
-    name: "Testing",
-    skills: ["Vitest", "Playwright", "Maestro", "Testing Library"],
+    name: "Build & CI/CD",
+    skills: ["SWC", "Vite", "Webpack", "GitHub Actions", "CircleCI"],
+  },
+  {
+    name: "Testing & Quality",
+    skills: ["Vitest", "Playwright", "Chromatic", "Testing Library"],
   },
   {
     name: "Observability",
-    skills: ["Datadog"],
+    skills: ["Datadog RUM", "APM", "Error Tracking", "Synthetics"],
+  },
+  {
+    name: "Design Systems",
+    skills: ["Storybook", "Figma"],
+  },
+  {
+    name: "Authentication",
+    skills: ["Auth0", "Descope"],
+  },
+  {
+    name: "Experimentation",
+    skills: ["Optimizely", "Feature Flags"],
+  },
+  {
+    name: "Data",
+    skills: ["PostgreSQL"],
+  },
+  {
+    name: "Code Quality",
+    skills: ["ESLint", "Prettier"],
   },
 ];
 
