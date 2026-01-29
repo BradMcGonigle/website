@@ -15,6 +15,7 @@
   "dependencies": {
     "components.backgrounds": "workspace:*",
     "components.content.mdx": "workspace:*",
+    "components.dev-toolbar": "workspace:*",
     "components.layout.footer": "workspace:*",
     "components.layout.header": "workspace:*",
     "geist": "catalog:",
