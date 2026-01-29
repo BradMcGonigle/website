@@ -155,9 +155,12 @@ const skillCategories: SkillCategory[] = [
     skills: [
       "React",
       "Next.js",
+      "Server Components",
       "Apollo Client",
       "TanStack Query",
+      "Zustand",
       "Tailwind CSS",
+      "CVA",
       "i18next",
     ],
   },
@@ -167,6 +170,7 @@ const skillCategories: SkillCategory[] = [
       "Monorepo Architecture",
       "Turborepo",
       "pnpm",
+      "Node.js",
       "Docker",
       "Kubernetes",
       "AWS",
@@ -176,7 +180,7 @@ const skillCategories: SkillCategory[] = [
   },
   {
     name: "Build & CI/CD",
-    skills: ["Vite", "Webpack", "GitHub Actions", "CircleCI"],
+    skills: ["SWC", "Vite", "Webpack", "GitHub Actions", "CircleCI"],
   },
   {
     name: "Testing & Quality",
@@ -189,6 +193,22 @@ const skillCategories: SkillCategory[] = [
   {
     name: "Design Systems",
     skills: ["Storybook", "Figma"],
+  },
+  {
+    name: "Authentication",
+    skills: ["Auth0", "Descope"],
+  },
+  {
+    name: "Experimentation",
+    skills: ["Optimizely", "Feature Flags"],
+  },
+  {
+    name: "Data",
+    skills: ["PostgreSQL"],
+  },
+  {
+    name: "Code Quality",
+    skills: ["ESLint", "Prettier"],
   },
 ];
 
