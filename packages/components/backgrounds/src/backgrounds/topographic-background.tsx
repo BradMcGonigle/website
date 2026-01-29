@@ -67,6 +67,15 @@ export function TopographicBackground() {
     return { h: parts[0] ?? 215, s: parts[1] ?? 16, l: parts[2] ?? 47 };
   }, []);
 
+  const isDarkMode = useCallback(() => {
+    if (typeof window === "undefined") return true;
+    return document.documentElement.classList.contains("dark");
+  }, []);
+
+  const getOpacityMultiplier = useCallback(() => {
+    return isDarkMode() ? 1 : 0.5;
+  }, [isDarkMode]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -93,6 +102,7 @@ export function TopographicBackground() {
 
       const color = getComputedColor();
       const time = timeRef.current;
+      const opacityMult = getOpacityMultiplier();
 
       ctx.clearRect(0, 0, width, height);
 
@@ -128,7 +138,8 @@ export function TopographicBackground() {
       // Draw contour lines using marching squares with interpolation
       for (let level = 0; level < CONTOUR_LEVELS; level++) {
         const threshold = -0.5 + level / CONTOUR_LEVELS;
-        const opacity = 0.08 + (level / CONTOUR_LEVELS) * 0.15;
+        const baseOpacity = 0.08 + (level / CONTOUR_LEVELS) * 0.15;
+        const opacity = baseOpacity * opacityMult;
         const fadeY = height * 0.6;
 
         ctx.strokeStyle = `hsla(${color.h}, ${color.s}%, ${color.l}%, ${opacity})`;
@@ -228,7 +239,7 @@ export function TopographicBackground() {
       cancelAnimationFrame(animationRef.current);
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [getComputedColor]);
+  }, [getComputedColor, getOpacityMultiplier]);
 
   return (
     <canvas
