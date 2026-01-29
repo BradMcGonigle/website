@@ -115,7 +115,7 @@ export function DotGridBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0"
+      className="pointer-events-none fixed inset-0 -z-10 bg-background"
       aria-hidden="true"
       data-background="dot-grid"
     />
