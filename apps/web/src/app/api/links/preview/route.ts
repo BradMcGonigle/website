@@ -89,8 +89,9 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
 
   let title = "";
   let description = "";
+  let authorName = "";
 
-  // Use YouTube oEmbed API to get video title
+  // Use YouTube oEmbed API to get video title and author
   const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url.href)}&format=json`;
 
   try {
@@ -98,12 +99,13 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
     if (response.ok) {
       const data = (await response.json()) as YouTubeOEmbedResponse;
       title = data.title ?? "";
+      authorName = data.author_name ?? "";
     }
   } catch {
     // Continue to try fetching the page
   }
 
-  // Fetch the YouTube page to get the description from JSON-LD or meta tags
+  // Fetch the YouTube page to get the description from twitter:description
   try {
     const pageResponse = await fetch(url.href, {
       headers: {
@@ -118,14 +120,18 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
     if (pageResponse.ok) {
       const html = await pageResponse.text();
 
-      // Use twitter:description as the primary source for YouTube
-      const twitterDescription = getMetaContent(
-        html,
-        'name="twitter:description"'
-      );
+      // Use a more robust regex for twitter:description that handles apostrophes
+      // Match content wrapped in double quotes (most common)
+      const twitterDescMatch =
+        /<meta[^>]+name=["']twitter:description["'][^>]+content="([^"]*)"/.exec(
+          html
+        ) ??
+        /<meta[^>]+content="([^"]*)"[^>]+name=["']twitter:description["']/.exec(
+          html
+        );
 
-      if (twitterDescription) {
-        const rawDescription = twitterDescription;
+      if (twitterDescMatch?.[1]) {
+        const rawDescription = twitterDescMatch[1];
         // Skip generic YouTube description
         if (!rawDescription.includes("Enjoy the videos and music you love")) {
           if (rawDescription.length > 300) {
@@ -146,6 +152,11 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
     }
   } catch {
     // Continue with whatever we have
+  }
+
+  // Fallback: use author/channel name if no description found
+  if (!description && authorName) {
+    description = `By ${authorName}`;
   }
 
   return {
