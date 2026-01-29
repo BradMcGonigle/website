@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { VercelToolbar } from "@vercel/toolbar/next";
 import { Header } from "components.layout.header";
 import { Footer } from "components.layout.footer";
 import { BackgroundProvider, DevBackgroundToolbar } from "components.backgrounds";
@@ -82,6 +83,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </BackgroundProvider>
+          <VercelToolbar />
         </ThemeProvider>
       </body>
     </html>

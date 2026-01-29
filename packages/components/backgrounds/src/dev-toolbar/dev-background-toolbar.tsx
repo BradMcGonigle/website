@@ -1,17 +1,21 @@
 "use client";
 
 import { useBackground } from "../hooks/use-background";
+import { useVercelAuth } from "./use-vercel-auth";
 
 /**
  * Dev-only toolbar for switching backgrounds.
  * Mimics Arc Browser's developer mode bar.
- * Only renders when process.env.NODE_ENV === 'development'.
+ * Renders in development mode OR in production when authenticated with Vercel.
  */
 export function DevBackgroundToolbar() {
   const { currentBackground, backgrounds, setBackground } = useBackground();
+  const isVercelAuthenticated = useVercelAuth();
 
-  // Only render in development
-  if (process.env.NODE_ENV !== "development") {
+  const isDev = process.env.NODE_ENV === "development";
+  const shouldShow = isDev || isVercelAuthenticated;
+
+  if (!shouldShow) {
     return null;
   }
 
