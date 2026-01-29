@@ -1,9 +1,10 @@
 "use client";
 
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useSyncExternalStore, useState, useCallback, type ReactNode } from "react";
 import { backgrounds } from "../backgrounds";
 import { BackgroundContext } from "./background-context";
 import { useBackgroundSelection } from "../hooks/use-background-selection";
+import type { BackgroundId } from "../types";
 
 // No-op subscribe function for useSyncExternalStore (client detection only)
 function subscribe() {
@@ -23,7 +24,14 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
     () => false
   );
 
-  const { currentBackground, isLoading } = useBackgroundSelection();
+  const { currentBackground: selectedBackground, isLoading } = useBackgroundSelection();
+  const [overrideBackground, setOverrideBackground] = useState<BackgroundId | null>(null);
+
+  const setBackground = useCallback((id: BackgroundId) => {
+    setOverrideBackground(id);
+  }, []);
+
+  const currentBackground = overrideBackground ?? selectedBackground;
 
   // Server render: no background, just children
   if (!mounted) {
@@ -41,7 +49,7 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
 
   return (
     <BackgroundContext.Provider
-      value={{ currentBackground, backgrounds, isLoading }}
+      value={{ currentBackground, backgrounds, isLoading, setBackground }}
     >
       {children}
       {BackgroundComponent && <BackgroundComponent />}
