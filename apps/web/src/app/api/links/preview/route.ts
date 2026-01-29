@@ -12,6 +12,12 @@ interface RequestBody {
   url?: string;
 }
 
+interface YouTubeOEmbedResponse {
+  title?: string;
+  author_name?: string;
+  thumbnail_url?: string;
+}
+
 function isValidApiKey(request: NextRequest): boolean {
   const apiKey = process.env.LINKS_API_KEY;
   if (!apiKey) return false;
@@ -43,6 +49,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
+    // For YouTube URLs, use oEmbed API for better metadata
+    if (isYouTubeUrl(parsedUrl)) {
+      const metadata = await fetchYouTubeMetadata(parsedUrl);
+      return NextResponse.json(metadata);
+    }
+
     // Fetch the page
     const response = await fetch(parsedUrl.href, {
       headers: {
@@ -71,16 +83,39 @@ export async function POST(request: NextRequest) {
   }
 }
 
+async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
+  const videoId = extractYouTubeVideoId(url);
+  const images = videoId ? getYouTubeThumbnails(videoId) : [];
+
+  // Use YouTube oEmbed API to get video title and author
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url.href)}&format=json`;
+
+  try {
+    const response = await fetch(oembedUrl);
+    if (response.ok) {
+      const data = (await response.json()) as YouTubeOEmbedResponse;
+      return {
+        title: data.title ?? "",
+        description: data.author_name ? `By ${data.author_name}` : "",
+        images,
+        url: url.href,
+      };
+    }
+  } catch {
+    // Fall through to default response
+  }
+
+  // Fallback if oEmbed fails
+  return {
+    title: "",
+    description: "",
+    images,
+    url: url.href,
+  };
+}
+
 function extractMetadata(html: string, baseUrl: URL): PageMetadata {
   const images: string[] = [];
-
-  // For YouTube URLs, prepend high-quality thumbnails
-  if (isYouTubeUrl(baseUrl)) {
-    const videoId = extractYouTubeVideoId(baseUrl);
-    if (videoId) {
-      images.push(...getYouTubeThumbnails(videoId));
-    }
-  }
 
   // Extract title
   const ogTitle = getMetaContent(html, 'property="og:title"');
@@ -97,36 +132,34 @@ function extractMetadata(html: string, baseUrl: URL): PageMetadata {
   const description =
     ogDescription ?? twitterDescription ?? metaDescription ?? "";
 
-  // Extract OG image (skip for YouTube since we already have thumbnails)
+  // Extract OG image
   const ogImage = getMetaContent(html, 'property="og:image"');
-  if (ogImage && !isYouTubeUrl(baseUrl)) {
+  if (ogImage) {
     images.push(resolveUrl(ogImage, baseUrl));
   }
 
-  // Extract Twitter image (skip for YouTube since we already have thumbnails)
+  // Extract Twitter image
   const twitterImage = getMetaContent(html, 'name="twitter:image"');
-  if (twitterImage && twitterImage !== ogImage && !isYouTubeUrl(baseUrl)) {
+  if (twitterImage && twitterImage !== ogImage) {
     images.push(resolveUrl(twitterImage, baseUrl));
   }
 
-  // Extract other images from the page (limit to first 10, skip for YouTube)
-  if (!isYouTubeUrl(baseUrl)) {
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let match;
-    while ((match = imgRegex.exec(html)) !== null && images.length < 12) {
-      const src = match[1];
-      // Skip data URLs, tiny images, and tracking pixels
-      if (
-        src &&
-        !src.startsWith("data:") &&
-        !src.includes("tracking") &&
-        !src.includes("pixel") &&
-        !src.includes("1x1")
-      ) {
-        const resolvedSrc = resolveUrl(src, baseUrl);
-        if (!images.includes(resolvedSrc)) {
-          images.push(resolvedSrc);
-        }
+  // Extract other images from the page (limit to first 10)
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+  let match;
+  while ((match = imgRegex.exec(html)) !== null && images.length < 12) {
+    const src = match[1];
+    // Skip data URLs, tiny images, and tracking pixels
+    if (
+      src &&
+      !src.startsWith("data:") &&
+      !src.includes("tracking") &&
+      !src.includes("pixel") &&
+      !src.includes("1x1")
+    ) {
+      const resolvedSrc = resolveUrl(src, baseUrl);
+      if (!images.includes(resolvedSrc)) {
+        images.push(resolvedSrc);
       }
     }
   }
