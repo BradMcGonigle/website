@@ -49,7 +49,7 @@ export default function LinksListPage({ links }: LinksListPageProps) {
                   <div className="aspect-[2/1] overflow-hidden bg-muted">
                     <img
                       src={link.image}
-                      alt=""
+                      alt={`Preview image for ${link.title}`}
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
                   </div>

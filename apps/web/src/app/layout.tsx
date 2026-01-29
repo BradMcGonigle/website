@@ -6,11 +6,53 @@ import { Footer } from "components.layout.footer";
 import { BackgroundProvider, DevBackgroundToolbar } from "components.backgrounds";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { site } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Brad McGonigle",
-  description: "Personal website of Brad McGonigle",
+  metadataBase: new URL(site.url),
+  title: {
+    default: site.name,
+    template: `%s | ${site.name}`,
+  },
+  description: site.description,
+  authors: [{ name: site.author.name, url: site.author.url }],
+  creator: site.author.name,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: site.url,
+    title: site.name,
+    description: site.description,
+    siteName: site.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.name,
+    description: site.description,
+    creator: "@BradMcGonigle",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: site.url,
+    types: {
+      "application/rss+xml": [
+        { url: "/blog/feed.xml", title: "Blog RSS Feed" },
+        { url: "/links/feed.xml", title: "Links RSS Feed" },
+        { url: "/changelog/feed.xml", title: "Changelog RSS Feed" },
+      ],
+    },
+  },
 };
 
 export default function RootLayout({
