@@ -66,7 +66,7 @@ const config: NextConfig = {
     ];
   },
 
-  async redirects() {
+  redirects() {
     return [
       {
         // Redirect old Gatsby tag pages to links
