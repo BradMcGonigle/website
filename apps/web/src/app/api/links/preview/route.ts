@@ -118,49 +118,16 @@ async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
     if (pageResponse.ok) {
       const html = await pageResponse.text();
 
-      // Try to extract description from JSON-LD (more reliable)
-      const jsonLdMatch =
-        /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-      let match;
-      while ((match = jsonLdMatch.exec(html)) !== null) {
-        const jsonContent = match[1];
-        if (!jsonContent) continue;
-        try {
-          const jsonLd = JSON.parse(jsonContent) as {
-            description?: string;
-            name?: string;
-          };
-          if (jsonLd.description) {
-            const rawDescription = jsonLd.description;
-            if (rawDescription.length > 300) {
-              description = decodeHtmlEntities(
-                rawDescription.slice(0, 297).trim() + "..."
-              );
-            } else {
-              description = decodeHtmlEntities(rawDescription.trim());
-            }
-            break;
-          }
-        } catch {
-          // Invalid JSON, continue to next script tag
-        }
-      }
+      // Use twitter:description as the primary source for YouTube
+      const twitterDescription = getMetaContent(
+        html,
+        'name="twitter:description"'
+      );
 
-      // Fallback to meta tags if JSON-LD didn't have description
-      if (!description) {
-        const ogDescription = getMetaContent(
-          html,
-          'property="og:description"'
-        );
-        const metaDescription = getMetaContent(html, 'name="description"');
-        let rawDescription = ogDescription ?? metaDescription ?? "";
-
+      if (twitterDescription) {
+        const rawDescription = twitterDescription;
         // Skip generic YouTube description
-        if (rawDescription.includes("Enjoy the videos and music you love")) {
-          rawDescription = "";
-        }
-
-        if (rawDescription) {
+        if (!rawDescription.includes("Enjoy the videos and music you love")) {
           if (rawDescription.length > 300) {
             description = decodeHtmlEntities(
               rawDescription.slice(0, 297).trim() + "..."
