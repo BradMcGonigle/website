@@ -1,0 +1,137 @@
+# Dependabot configuration for automated dependency updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # npm/pnpm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    # Limit open PRs to reduce noise
+    open-pull-requests-limit: 10
+    # Target branch for PRs
+    target-branch: "main"
+    # Commit message settings
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+    # Labels for PRs
+    labels:
+      - "dependencies"
+    # Group related updates to reduce PR noise
+    groups:
+      # Production dependencies grouped by type
+      react-ecosystem:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - "minor"
+          - "patch"
+      next-js:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+        # Don't group Next.js updates - handle individually for security visibility
+        applies-to: version-updates
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "autoprefixer"
+          - "postcss"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "vitest"
+          - "@testing-library/*"
+          - "jsdom"
+          - "playwright"
+          - "@playwright/*"
+        update-types:
+          - "minor"
+          - "patch"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+      build-tools:
+        patterns:
+          - "turbo"
+          - "tsup"
+        update-types:
+          - "minor"
+          - "patch"
+      formatting:
+        patterns:
+          - "prettier"
+          - "prettier-*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Minor and patch updates for everything else
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+        exclude-patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+          - "next"
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript*"
+          - "@types/*"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "vitest"
+          - "@testing-library/*"
+          - "playwright*"
+          - "@playwright/*"
+          - "turbo"
+          - "tsup"
+          - "prettier*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
