@@ -2,7 +2,7 @@
 
 ## Before Committing Code
 
-ALWAYS run these checks before creating any git commit:
+Run these checks before creating any git commit:
 
 1. `pnpm typecheck` - must pass with zero errors
 2. `pnpm lint` - must pass with zero errors
@@ -10,6 +10,12 @@ ALWAYS run these checks before creating any git commit:
 4. `pnpm test:e2e` - all tests must pass
 
 Do NOT commit until all checks pass. If any check fails, fix the issues first.
+
+### Content-Only Changes
+
+Skip all checks when committing changes that ONLY touch content files in `apps/web/content/` (blog posts, changelog entries, links, projects). These are MDX files that don't affect code quality checks.
+
+Content-only commits can be made directly without running typecheck, lint, or tests.
 
 ## Quick Check Command
 
