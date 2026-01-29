@@ -27,8 +27,8 @@ export function DevToolbar({ children }: DevToolbarProps) {
     <div
       style={{
         width: "100%",
-        height: 28,
-        background: "linear-gradient(90deg, #FF9500 0%, #FFCC00 100%)",
+        height: 36,
+        background: "linear-gradient(90deg, #E8B86D 0%, #D4A855 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -36,10 +36,10 @@ export function DevToolbar({ children }: DevToolbarProps) {
         fontFamily: "system-ui, -apple-system, sans-serif",
         fontSize: 12,
         fontWeight: 500,
-        color: "rgba(0, 0, 0, 0.8)",
+        color: "rgba(0, 0, 0, 0.75)",
         zIndex: 9999,
         position: "relative",
-        padding: "0 8px",
+        padding: "0 12px",
       }}
     >
       <span
@@ -67,7 +67,7 @@ export function DevToolbarDivider() {
     <span
       style={{
         width: 1,
-        height: 14,
+        height: 18,
         background: "rgba(0, 0, 0, 0.2)",
         marginLeft: 8,
         marginRight: 8,
