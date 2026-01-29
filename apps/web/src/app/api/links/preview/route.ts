@@ -74,6 +74,14 @@ export async function POST(request: NextRequest) {
 function extractMetadata(html: string, baseUrl: URL): PageMetadata {
   const images: string[] = [];
 
+  // For YouTube URLs, prepend high-quality thumbnails
+  if (isYouTubeUrl(baseUrl)) {
+    const videoId = extractYouTubeVideoId(baseUrl);
+    if (videoId) {
+      images.push(...getYouTubeThumbnails(videoId));
+    }
+  }
+
   // Extract title
   const ogTitle = getMetaContent(html, 'property="og:title"');
   const twitterTitle = getMetaContent(html, 'name="twitter:title"');
@@ -89,34 +97,36 @@ function extractMetadata(html: string, baseUrl: URL): PageMetadata {
   const description =
     ogDescription ?? twitterDescription ?? metaDescription ?? "";
 
-  // Extract OG image
+  // Extract OG image (skip for YouTube since we already have thumbnails)
   const ogImage = getMetaContent(html, 'property="og:image"');
-  if (ogImage) {
+  if (ogImage && !isYouTubeUrl(baseUrl)) {
     images.push(resolveUrl(ogImage, baseUrl));
   }
 
-  // Extract Twitter image
+  // Extract Twitter image (skip for YouTube since we already have thumbnails)
   const twitterImage = getMetaContent(html, 'name="twitter:image"');
-  if (twitterImage && twitterImage !== ogImage) {
+  if (twitterImage && twitterImage !== ogImage && !isYouTubeUrl(baseUrl)) {
     images.push(resolveUrl(twitterImage, baseUrl));
   }
 
-  // Extract other images from the page (limit to first 10)
-  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-  let match;
-  while ((match = imgRegex.exec(html)) !== null && images.length < 12) {
-    const src = match[1];
-    // Skip data URLs, tiny images, and tracking pixels
-    if (
-      src &&
-      !src.startsWith("data:") &&
-      !src.includes("tracking") &&
-      !src.includes("pixel") &&
-      !src.includes("1x1")
-    ) {
-      const resolvedSrc = resolveUrl(src, baseUrl);
-      if (!images.includes(resolvedSrc)) {
-        images.push(resolvedSrc);
+  // Extract other images from the page (limit to first 10, skip for YouTube)
+  if (!isYouTubeUrl(baseUrl)) {
+    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+    let match;
+    while ((match = imgRegex.exec(html)) !== null && images.length < 12) {
+      const src = match[1];
+      // Skip data URLs, tiny images, and tracking pixels
+      if (
+        src &&
+        !src.startsWith("data:") &&
+        !src.includes("tracking") &&
+        !src.includes("pixel") &&
+        !src.includes("1x1")
+      ) {
+        const resolvedSrc = resolveUrl(src, baseUrl);
+        if (!images.includes(resolvedSrc)) {
+          images.push(resolvedSrc);
+        }
       }
     }
   }
@@ -159,4 +169,62 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ");
+}
+
+function isYouTubeUrl(url: URL): boolean {
+  const hostname = url.hostname.toLowerCase();
+  return (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "youtu.be" ||
+    hostname === "m.youtube.com"
+  );
+}
+
+function extractYouTubeVideoId(url: URL): string | null {
+  const hostname = url.hostname.toLowerCase();
+
+  // Handle youtu.be short URLs
+  if (hostname === "youtu.be") {
+    const videoId = url.pathname.slice(1).split("/")[0];
+    if (!videoId) return null;
+    return videoId;
+  }
+
+  // Handle youtube.com URLs
+  if (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "m.youtube.com"
+  ) {
+    // /watch?v=VIDEO_ID
+    const vParam = url.searchParams.get("v");
+    if (vParam) {
+      return vParam;
+    }
+
+    // /embed/VIDEO_ID or /v/VIDEO_ID
+    const pathMatch = /^\/(embed|v)\/([^/?]+)/.exec(url.pathname);
+    if (pathMatch?.[2]) {
+      return pathMatch[2];
+    }
+
+    // /shorts/VIDEO_ID
+    const shortsMatch = /^\/shorts\/([^/?]+)/.exec(url.pathname);
+    if (shortsMatch?.[1]) {
+      return shortsMatch[1];
+    }
+  }
+
+  return null;
+}
+
+function getYouTubeThumbnails(videoId: string): string[] {
+  // Return multiple thumbnail options in order of quality (highest first)
+  return [
+    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+  ];
 }
