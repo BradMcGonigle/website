@@ -20,6 +20,7 @@
     "react-dom": "catalog:"
   },
   "dependencies": {
+    "components.content.mdx": "workspace:*",
     "lucide-react": "^0.563.0",
     "next": "catalog:"
   },

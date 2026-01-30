@@ -1,3 +1,4 @@
+import { MDXContent } from "components.content.mdx";
 import { ExternalLink, Github } from "lucide-react";
 
 export interface Project {
@@ -9,6 +10,7 @@ export interface Project {
   featured: boolean;
   order: number;
   slug: string;
+  content: string;
 }
 
 export interface ProjectsListPageProps {
@@ -44,9 +46,14 @@ export default function ProjectsListPage({ projects }: ProjectsListPageProps) {
                   <h2 className="font-semibold group-hover:text-primary">
                     {project.title}
                   </h2>
-                  <p className="mt-2 flex-1 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {project.description}
                   </p>
+                  {project.content && (
+                    <div className="mt-4 flex-1 prose prose-sm prose-neutral dark:prose-invert prose-p:text-muted-foreground prose-li:text-muted-foreground prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-base prose-h2:mt-0 prose-ul:my-2">
+                      <MDXContent code={project.content} />
+                    </div>
+                  )}
                   {project.tech.length > 0 && (
                     <ul
                       className="mt-4 flex flex-wrap gap-1"

@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import ProjectsListPage, { type Project } from "./index";
+
+vi.mock("components.content.mdx", () => ({
+  MDXContent: ({ code }: { code: string }) => (
+    <div data-testid="mdx-content">{code}</div>
+  ),
+}));
 
 const mockProjects: Project[] = [
   {
@@ -12,6 +18,7 @@ const mockProjects: Project[] = [
     featured: true,
     order: 2,
     slug: "featured-project",
+    content: "Featured project content",
   },
   {
     title: "Regular Project",
@@ -21,6 +28,7 @@ const mockProjects: Project[] = [
     featured: false,
     order: 1,
     slug: "regular-project",
+    content: "Regular project content",
   },
   {
     title: "Another Featured",
@@ -30,6 +38,7 @@ const mockProjects: Project[] = [
     featured: true,
     order: 1,
     slug: "another-featured",
+    content: "",
   },
 ];
 
@@ -93,5 +102,14 @@ describe("ProjectsListPage", () => {
   it("shows empty state when no projects", () => {
     render(<ProjectsListPage projects={[]} />);
     expect(screen.getByText("No projects yet. Check back soon!")).toBeInTheDocument();
+  });
+
+  it("renders MDX content when provided", () => {
+    render(<ProjectsListPage projects={mockProjects} />);
+    const mdxContents = screen.getAllByTestId("mdx-content");
+    // Only 2 projects have non-empty content
+    expect(mdxContents).toHaveLength(2);
+    expect(screen.getByText("Featured project content")).toBeInTheDocument();
+    expect(screen.getByText("Regular project content")).toBeInTheDocument();
   });
 });

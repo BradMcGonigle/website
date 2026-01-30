@@ -808,6 +808,9 @@ importers:
 
   packages/pages/projects-list:
     dependencies:
+      components.content.mdx:
+        specifier: workspace:*
+        version: link:../../components/content/mdx
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.3)
