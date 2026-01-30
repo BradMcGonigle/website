@@ -4,6 +4,7 @@ import { ExternalLink, Github } from "lucide-react";
 export interface Project {
   title: string;
   description: string;
+  image?: string;
   url?: string;
   repo?: string;
   tech: string[];
@@ -42,6 +43,15 @@ export default function ProjectsListPage({ projects }: ProjectsListPageProps) {
           {sortedProjects.map((project) => (
             <li key={project.slug}>
               <div className="group relative isolate flex h-full flex-col overflow-hidden rounded-lg border border-border backdrop-blur-[2px] transition-colors hover:border-primary">
+                {project.image && (
+                  <div className="aspect-[2/1] overflow-hidden bg-muted">
+                    <img
+                      src={project.image}
+                      alt={`Preview image for ${project.title}`}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  </div>
+                )}
                 <div className="flex flex-1 flex-col p-4">
                   <h2 className="font-semibold group-hover:text-primary">
                     {project.title}

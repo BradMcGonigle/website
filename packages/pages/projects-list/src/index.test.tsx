@@ -12,6 +12,7 @@ const mockProjects: Project[] = [
   {
     title: "Featured Project",
     description: "A featured project description",
+    image: "/images/projects/featured.png",
     url: "https://example.com/featured",
     repo: "https://github.com/example/featured",
     tech: ["React", "TypeScript"],
@@ -111,5 +112,21 @@ describe("ProjectsListPage", () => {
     expect(mdxContents).toHaveLength(2);
     expect(screen.getByText("Featured project content")).toBeInTheDocument();
     expect(screen.getByText("Regular project content")).toBeInTheDocument();
+  });
+
+  it("renders project image when provided", () => {
+    render(<ProjectsListPage projects={mockProjects} />);
+    const image = screen.getByRole("img", {
+      name: "Preview image for Featured Project",
+    });
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute("src", "/images/projects/featured.png");
+  });
+
+  it("does not render image when not provided", () => {
+    render(<ProjectsListPage projects={mockProjects} />);
+    // Only one project has an image
+    const images = screen.getAllByRole("img");
+    expect(images).toHaveLength(1);
   });
 });
