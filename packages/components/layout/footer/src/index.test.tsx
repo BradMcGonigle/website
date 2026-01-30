@@ -2,6 +2,16 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { Footer } from "./index";
 
+vi.mock("next/link", () => ({
+  default: ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => <a href={href}>{children}</a>,
+}));
+
 describe("Footer", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -27,5 +37,16 @@ describe("Footer", () => {
     expect(
       screen.getByText(/Brad McGonigle\. All rights reserved\./i)
     ).toBeInTheDocument();
+  });
+
+  it("renders footer navigation with changelog link", () => {
+    render(<Footer />);
+    expect(
+      screen.getByRole("navigation", { name: "Footer navigation" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
+      "href",
+      "/changelog"
+    );
   });
 });

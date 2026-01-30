@@ -1,8 +1,8 @@
 {
-  "name": "components.layout.footer",
+  "name": "pages.projects-list",
   "version": "0.0.0",
   "private": true,
-  "description": "Footer component",
+  "description": "Projects list page component",
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "exports": {
@@ -16,9 +16,13 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "peerDependencies": {
-    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
+  },
+  "dependencies": {
+    "components.content.mdx": "workspace:*",
+    "lucide-react": "^0.563.0",
+    "next": "catalog:"
   },
   "devDependencies": {
     "@testing-library/dom": "catalog:",
@@ -31,7 +35,6 @@
     "configs.vitest": "workspace:*",
     "eslint": "catalog:",
     "jsdom": "catalog:",
-    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:",
