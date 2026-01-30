@@ -5,7 +5,7 @@ import { MDXContent } from "@/components/mdx-content";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Changelog | Brad McGonigle",
+  title: "Changelog",
   description: "All notable changes and updates to this site",
   alternates: {
     types: {

@@ -3,7 +3,7 @@ import { projects } from "#content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Projects | Brad McGonigle",
+  title: "Projects",
   description:
     "Open source projects and experiments I've been working on.",
 };
