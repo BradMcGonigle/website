@@ -142,14 +142,6 @@ This runs before every commit. The E2E suite adds about 30 seconds to the feedba
 
 What's not tested: visual appearance. I don't have visual regression tests, which means CSS changes could introduce bugs that the test suite wouldn't catch. This is a known gap—the cost of maintaining visual tests didn't seem worth it for a personal site.
 
-## What I'd Do Differently
-
-**Start simpler on the monorepo.** The current structure has more packages than necessary. The `pages` and `components` separation made sense in theory but in practice means more boilerplate for each new feature. I'd consolidate into fewer, larger packages.
-
-**Skip the custom animations initially.** They were fun to build but consumed time that could have gone toward content. If I were advising someone else, I'd suggest launching with a minimal design and adding polish later.
-
-**Write more content before building.** I spent weeks on infrastructure for a site with eight blog posts. The build system is ready for hundreds of posts that don't exist yet. Starting with a backlog of content would have clarified which features actually mattered.
-
 ## Performance
 
 The production build produces a 89KB first-load JavaScript bundle for the home page, which is reasonable but not exceptional. The blog post pages are lighter at around 45KB since they're primarily static content.
