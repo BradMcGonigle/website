@@ -42,7 +42,7 @@ export default function ProjectsListPage({ projects }: ProjectsListPageProps) {
         <ul className="grid gap-6 sm:grid-cols-2">
           {sortedProjects.map((project) => (
             <li key={project.slug}>
-              <div className="group relative isolate flex h-full flex-col overflow-hidden rounded-lg border border-border backdrop-blur-[2px] transition-colors hover:border-primary">
+              <div className="group relative isolate flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card backdrop-blur-[2px] transition-colors hover:border-primary">
                 {project.image && (
                   <div className="aspect-[2/1] overflow-hidden bg-muted">
                     <img
