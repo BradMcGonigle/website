@@ -24,5 +24,8 @@
     "prettier-plugin-tailwindcss": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@vercel/toolbar": "^0.1.41"
   }
 }

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { VercelToolbar } from "@vercel/toolbar/next";
+import { Link2 } from "lucide-react";
 import { Header } from "components.layout.header";
 import { Footer } from "components.layout.footer";
-import { BackgroundProvider, DevBackgroundToolbar } from "components.backgrounds";
+import { BackgroundProvider, BackgroundSelector } from "components.backgrounds";
+import { DevToolbar, DevToolbarButton, DevToolbarDivider } from "components.dev-toolbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { site } from "@/lib/site";
@@ -77,13 +80,24 @@ export default function RootLayout({
             Skip to main content
           </a>
           <BackgroundProvider>
-            <DevBackgroundToolbar />
+            <DevToolbar>
+              <BackgroundSelector />
+              <DevToolbarDivider />
+              <DevToolbarButton
+                href="/links/new"
+                icon={<Link2 size={14} />}
+                title="Add new link"
+              >
+                New Link
+              </DevToolbarButton>
+            </DevToolbar>
             <Header actions={<ThemeToggle />} />
             <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
               {children}
             </main>
             <Footer />
           </BackgroundProvider>
+          <VercelToolbar />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

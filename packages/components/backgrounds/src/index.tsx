@@ -7,7 +7,7 @@ export { useBackground } from "./hooks/use-background";
 export { useBackgroundSelection } from "./hooks/use-background-selection";
 
 // Dev tools
-export { DevBackgroundToolbar } from "./dev-toolbar/dev-background-toolbar";
+export { BackgroundSelector } from "./dev-toolbar/background-selector";
 
 // Types
 export type { BackgroundId, BackgroundConfig, BackgroundContextValue } from "./types";
