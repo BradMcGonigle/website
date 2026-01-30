@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Blog | Brad McGonigle",
+  title: "Blog",
   description: "Thoughts on development, technology, and more.",
   alternates: {
     types: {
