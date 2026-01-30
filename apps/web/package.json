@@ -13,6 +13,8 @@
     "clean": "rm -rf .next .turbo node_modules e2e-results playwright-report"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^1.0.14",
     "components.backgrounds": "workspace:*",
     "components.content.mdx": "workspace:*",
     "components.dev-toolbar": "workspace:*",
@@ -28,6 +30,7 @@
     "pages.changelog": "workspace:*",
     "pages.home": "workspace:*",
     "pages.links-list": "workspace:*",
+    "pages.projects-list": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "rehype-pretty-code": "^0.14.1",

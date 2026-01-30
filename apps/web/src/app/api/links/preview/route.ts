@@ -1,5 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+  validateUrlForSSRF,
+  checkRateLimit,
+  RATE_LIMITS,
+  REQUEST_TIMEOUT,
+  isValidApiKeyFromRequest,
+} from "@/lib/security";
 
 interface PageMetadata {
   title: string;
@@ -12,19 +19,42 @@ interface RequestBody {
   url?: string;
 }
 
-function isValidApiKey(request: NextRequest): boolean {
-  const apiKey = process.env.LINKS_API_KEY;
-  if (!apiKey) return false;
+interface YouTubeOEmbedResponse {
+  title?: string;
+  author_name?: string;
+  thumbnail_url?: string;
+}
 
+function getClientIdentifier(request: NextRequest): string {
+  // Use API key as identifier since all requests are authenticated
   const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) return false;
-
-  return authHeader.slice(7) === apiKey;
+  if (authHeader?.startsWith("Bearer ")) {
+    return `apikey:${authHeader.slice(7).slice(0, 8)}`; // Use first 8 chars
+  }
+  // Fallback to IP
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() ?? "unknown";
+  return `ip:${ip}`;
 }
 
 export async function POST(request: NextRequest) {
-  if (!isValidApiKey(request)) {
+  if (!isValidApiKeyFromRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limiting
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(clientId, RATE_LIMITS.preview);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rateLimit.retryAfter ?? 60),
+        },
+      }
+    );
   }
 
   try {
@@ -35,33 +65,71 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Validate URL
-    let parsedUrl: URL;
-    try {
-      parsedUrl = new URL(url);
-    } catch {
-      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
-    }
-
-    // Fetch the page
-    const response = await fetch(parsedUrl.href, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; LinkPreview/1.0; +https://bradmcgonigle.com)",
-      },
-    });
-
-    if (!response.ok) {
+    // SSRF protection: validate URL before fetching
+    const urlValidation = validateUrlForSSRF(url);
+    if (!urlValidation.isValid) {
       return NextResponse.json(
-        { error: `Failed to fetch URL: ${response.status}` },
+        { error: urlValidation.error ?? "Invalid URL" },
         { status: 400 }
       );
     }
 
-    const html = await response.text();
-    const metadata = extractMetadata(html, parsedUrl);
+    // Parse URL after validation
+    const parsedUrl = new URL(url);
 
-    return NextResponse.json(metadata);
+    // For YouTube URLs, use oEmbed API for better metadata
+    if (isYouTubeUrl(parsedUrl)) {
+      const metadata = await fetchYouTubeMetadata(parsedUrl);
+      return NextResponse.json(metadata);
+    }
+
+    // Fetch the page with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      const response = await fetch(parsedUrl.href, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (compatible; LinkPreview/1.0; +https://bradmcgonigle.com)",
+        },
+        signal: controller.signal,
+        redirect: "follow",
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        return NextResponse.json(
+          { error: `Failed to fetch URL: ${response.status}` },
+          { status: 400 }
+        );
+      }
+
+      // Check final URL after redirects for SSRF
+      const finalUrl = new URL(response.url);
+      const finalUrlValidation = validateUrlForSSRF(finalUrl.href);
+      if (!finalUrlValidation.isValid) {
+        return NextResponse.json(
+          { error: "Redirected to disallowed URL" },
+          { status: 400 }
+        );
+      }
+
+      const html = await response.text();
+      const metadata = extractMetadata(html, finalUrl);
+
+      return NextResponse.json(metadata);
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError instanceof Error && fetchError.name === "AbortError") {
+        return NextResponse.json(
+          { error: "Request timed out" },
+          { status: 408 }
+        );
+      }
+      throw fetchError;
+    }
   } catch (error) {
     console.error("Preview error:", error);
     return NextResponse.json(
@@ -69,6 +137,85 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function fetchYouTubeMetadata(url: URL): Promise<PageMetadata> {
+  const videoId = extractYouTubeVideoId(url);
+  const images = videoId ? getYouTubeThumbnails(videoId) : [];
+
+  let title = "";
+  let description = "";
+  let authorName = "";
+
+  // Use YouTube oEmbed API to get video title and author
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url.href)}&format=json`;
+
+  try {
+    const response = await fetch(oembedUrl);
+    if (response.ok) {
+      const data = (await response.json()) as YouTubeOEmbedResponse;
+      title = data.title ?? "";
+      authorName = data.author_name ?? "";
+    }
+  } catch {
+    // Continue to try fetching the page
+  }
+
+  // Fetch the YouTube page to get the description from twitter:description
+  try {
+    const pageResponse = await fetch(url.href, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+      },
+    });
+
+    if (pageResponse.ok) {
+      const html = await pageResponse.text();
+
+      // Try multiple sources for description, in order of preference
+      const twitterDesc = getMetaContent(html, 'name="twitter:description"');
+      const ogDesc = getMetaContent(html, 'property="og:description"');
+      const metaDesc = getMetaContent(html, 'name="description"');
+      const rawDescription = twitterDesc ?? ogDesc ?? metaDesc;
+
+      if (rawDescription) {
+        // Skip generic YouTube description
+        if (!rawDescription.includes("Enjoy the videos and music you love")) {
+          if (rawDescription.length > 300) {
+            description = decodeHtmlEntities(
+              rawDescription.slice(0, 297).trim() + "..."
+            );
+          } else {
+            description = decodeHtmlEntities(rawDescription.trim());
+          }
+        }
+      }
+
+      // If we didn't get title from oEmbed, try meta tags
+      if (!title) {
+        const ogTitle = getMetaContent(html, 'property="og:title"');
+        title = ogTitle ? decodeHtmlEntities(ogTitle.trim()) : "";
+      }
+    }
+  } catch {
+    // Continue with whatever we have
+  }
+
+  // Fallback: use author/channel name if no description found
+  if (!description && authorName) {
+    description = `By ${authorName}`;
+  }
+
+  return {
+    title,
+    description,
+    images,
+    url: url.href,
+  };
 }
 
 function extractMetadata(html: string, baseUrl: URL): PageMetadata {
@@ -92,13 +239,20 @@ function extractMetadata(html: string, baseUrl: URL): PageMetadata {
   // Extract OG image
   const ogImage = getMetaContent(html, 'property="og:image"');
   if (ogImage) {
-    images.push(resolveUrl(ogImage, baseUrl));
+    const resolvedOgImage = resolveUrl(ogImage, baseUrl);
+    // Validate image URLs for SSRF as well
+    if (resolvedOgImage && validateUrlForSSRF(resolvedOgImage).isValid) {
+      images.push(resolvedOgImage);
+    }
   }
 
   // Extract Twitter image
   const twitterImage = getMetaContent(html, 'name="twitter:image"');
   if (twitterImage && twitterImage !== ogImage) {
-    images.push(resolveUrl(twitterImage, baseUrl));
+    const resolvedTwitterImage = resolveUrl(twitterImage, baseUrl);
+    if (resolvedTwitterImage && validateUrlForSSRF(resolvedTwitterImage).isValid) {
+      images.push(resolvedTwitterImage);
+    }
   }
 
   // Extract other images from the page (limit to first 10)
@@ -115,7 +269,12 @@ function extractMetadata(html: string, baseUrl: URL): PageMetadata {
       !src.includes("1x1")
     ) {
       const resolvedSrc = resolveUrl(src, baseUrl);
-      if (!images.includes(resolvedSrc)) {
+      // Validate each image URL for SSRF
+      if (
+        resolvedSrc &&
+        !images.includes(resolvedSrc) &&
+        validateUrlForSSRF(resolvedSrc).isValid
+      ) {
         images.push(resolvedSrc);
       }
     }
@@ -159,4 +318,68 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ");
+}
+
+function isYouTubeUrl(url: URL): boolean {
+  const hostname = url.hostname.toLowerCase();
+  return (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "youtu.be" ||
+    hostname === "m.youtube.com"
+  );
+}
+
+function extractYouTubeVideoId(url: URL): string | null {
+  const hostname = url.hostname.toLowerCase();
+
+  // Handle youtu.be short URLs
+  if (hostname === "youtu.be") {
+    const videoId = url.pathname.slice(1).split("/")[0];
+    if (!videoId) return null;
+    return videoId;
+  }
+
+  // Handle youtube.com URLs
+  if (
+    hostname === "youtube.com" ||
+    hostname === "www.youtube.com" ||
+    hostname === "m.youtube.com"
+  ) {
+    // /watch?v=VIDEO_ID
+    const vParam = url.searchParams.get("v");
+    if (vParam) {
+      return vParam;
+    }
+
+    // /embed/VIDEO_ID or /v/VIDEO_ID
+    const pathMatch = /^\/(embed|v)\/([^/?]+)/.exec(url.pathname);
+    if (pathMatch?.[2]) {
+      return pathMatch[2];
+    }
+
+    // /shorts/VIDEO_ID
+    const shortsMatch = /^\/shorts\/([^/?]+)/.exec(url.pathname);
+    if (shortsMatch?.[1]) {
+      return shortsMatch[1];
+    }
+
+    // /live/VIDEO_ID (live streams)
+    const liveMatch = /^\/live\/([^/?]+)/.exec(url.pathname);
+    if (liveMatch?.[1]) {
+      return liveMatch[1];
+    }
+  }
+
+  return null;
+}
+
+function getYouTubeThumbnails(videoId: string): string[] {
+  // Return multiple thumbnail options in order of quality (highest first)
+  return [
+    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+  ];
 }
