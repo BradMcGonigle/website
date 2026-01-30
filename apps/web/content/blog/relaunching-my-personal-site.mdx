@@ -1,0 +1,159 @@
+---
+title: Relaunching My Personal Site with Next.js 16, React 19, and Claude Code
+description: After years on Gatsby, I've rebuilt my personal site from the ground up with a modern monorepo architecture, custom canvas animations, and an AI-assisted development workflow. Here's what worked, what didn't, and what I'd do differently.
+date: 2025-01-28
+createdAt: 2025-01-28T00:00:00.000Z
+tags:
+  - Development
+  - Next.js
+  - React
+  - AI
+---
+
+Personal sites have a way of falling behind. You build something, tweak it for a while, and then life happens. My previous Gatsby site served me well for years, but the ecosystem moved on, dependencies grew stale, and every time I thought about making changes, the friction felt insurmountable. So I did what any reasonable developer would do—I rebuilt the entire thing from scratch.
+
+## Why Start Over Instead of Migrate?
+
+The practical answer is that Gatsby's ecosystem has contracted significantly. Many plugins I depended on were abandoned, and the upgrade path from Gatsby 4 to 5 required touching nearly every file anyway. At that point, migration and rebuilding have similar costs, but rebuilding lets you reconsider every architectural decision.
+
+The honest answer is that I also wanted to work with current tools. But "I wanted to play with new tech" isn't a justification I'd accept on a work project, so I had to be clear with myself about what I was actually optimizing for: learning, maintainability over the next 3-5 years, and reducing the friction that had caused me to neglect the site in the first place.
+
+## Architecture Decisions and Trade-offs
+
+### Monorepo Structure
+
+I chose a monorepo using pnpm workspaces and Turborepo despite this being arguably over-engineered for a personal site. A single Next.js application would have been simpler and faster to set up.
+
+The trade-off I accepted: more configuration upfront, a steeper learning curve for the tooling, and slower cold builds. What I gained: isolated packages with independent test suites, the ability to refactor aggressively without fear of breaking unrelated code, and shared configurations that stay consistent across the codebase.
+
+```
+packages/
+  ├── pages/          # Page-level components
+  ├── components/     # Shared UI components
+  └── utils/          # Shared utilities
+configs/              # Shared TypeScript, ESLint, Tailwind configs
+apps/web/             # The Next.js application
+```
+
+Whether this pays off depends on how much I actually iterate on the site. If I'd abandoned it after launch, the monorepo would have been pure overhead. So far, the isolation has made it easier to add features incrementally—each change is scoped to a specific package, and the test suite tells me immediately if I've broken something elsewhere.
+
+### Why Next.js Over Astro
+
+Astro would have been a reasonable choice for a content-heavy site like this—it's designed for exactly this use case and ships less JavaScript by default. I went with Next.js because I work with it professionally and wanted the mental model to be identical between my day job and side projects. There's value in reducing context switching, even if Astro might have been technically better suited.
+
+The App Router is stable enough now that I'm not fighting it constantly, though the caching behavior still surprises me occasionally. Server components reduce the client bundle for content pages, which matters more than I expected—the blog post pages ship almost no JavaScript beyond the theme toggle.
+
+### Content Layer: Velite Over Alternatives
+
+For MDX content management, I evaluated three options:
+
+- **Contentlayer**: The most mature option, but the project was abandoned in 2023. Depending on unmaintained infrastructure for a rebuild meant to last years seemed unwise.
+- **Raw MDX with next-mdx-remote**: Maximum flexibility, but requires writing all the schema validation and slug generation yourself. More code to maintain.
+- **Velite**: Newer, actively maintained, with a similar API to Contentlayer. The risk is that it's less battle-tested, but the maintainer is responsive and the codebase is small enough to fork if necessary.
+
+Velite's schema definition gives me compile-time validation of frontmatter:
+
+```typescript
+const blog = defineCollection({
+  name: 'Blog',
+  pattern: 'blog/**/*.mdx',
+  schema: s.object({
+    title: s.string().max(100),
+    description: s.string().max(200),
+    date: s.isodate(),
+    tags: s.array(s.string()).optional(),
+    draft: s.boolean().default(false),
+  }),
+})
+```
+
+If I add a blog post with a malformed date or missing title, the build fails. This is the kind of guardrail that prevents the "it works on my machine" problems that plagued my Gatsby setup.
+
+## Canvas Animations: Why Not Just Use CSS?
+
+The site features seven canvas-based background animations that rotate every 8 hours: a pulsing dot grid, topographic contour lines, a particle flow field, a constellation with twinkling stars, wave interference patterns, an aurora borealis effect, and an animated Voronoi diagram.
+
+CSS animations would have been simpler for some of these—the dot grid, for instance, could probably be achieved with CSS. I chose canvas for a few reasons: I wanted all backgrounds to use the same rendering approach for consistency, several effects require per-pixel control that CSS can't provide, and I hadn't written canvas code in years and wanted to revisit it.
+
+The more complex backgrounds involve algorithms I found interesting to implement. The topographic background uses Perlin noise to generate a height field, then marching squares to extract contour lines—the same technique used in terrain rendering and medical imaging. The Voronoi background implements Fortune's algorithm for the cell computation, and the flow field uses curl noise for particle trajectories.
+
+Performance was a concern with seven different animations. All target 30fps and use `requestAnimationFrame` with frame skipping if the browser is under load. Each animation is optimized differently—the dot grid only redraws dots whose opacity has changed, while the flow field recycles particles that drift off-screen rather than creating new objects. On my test devices, the animations use less than 2% CPU when visible and pause entirely when the tab is backgrounded.
+
+The bundle cost is roughly 12KB gzipped for all seven animations. Framer Motion would have added ~25KB for arguably simpler code, though it wouldn't easily handle the algorithmic effects. Whether that trade-off is correct depends on your priorities—I valued the smaller bundle and the learning experience.
+
+## Dark Mode Implementation
+
+Theme support uses [next-themes](https://github.com/pacocoursey/next-themes), which solves the flash-of-wrong-theme problem that's surprisingly tricky to handle correctly.
+
+The issue: if you store the user's theme preference in localStorage and apply it with JavaScript, there's a brief flash where the page renders with the default theme before the JavaScript runs. This is especially jarring for dark mode users visiting a light-default site.
+
+The solution is a blocking script in the document head that runs before the page paints. `next-themes` injects this script automatically—it reads localStorage, determines the correct theme, and sets a class on the `<html>` element before React hydrates. The cost is a small amount of render-blocking JavaScript, but the alternative is a poor user experience.
+
+Code syntax highlighting required additional work. Shiki supports multiple themes, but switching between them at runtime isn't straightforward. The solution is to generate CSS variables for both themes and toggle them based on the current mode:
+
+```css
+:root {
+  --shiki-light: #24292e;
+  --shiki-dark: #e1e4e8;
+}
+.dark {
+  --shiki-light: #e1e4e8;
+  --shiki-dark: #24292e;
+}
+```
+
+This adds some unused CSS (both themes are always present), but the overhead is negligible compared to the complexity of dynamically re-highlighting code blocks.
+
+## AI-Assisted Development with Claude Code
+
+I built a significant portion of this site using [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Anthropic's CLI for AI-assisted development. The experience was more nuanced than the typical "10x productivity" narrative suggests.
+
+### Where It Helped
+
+The highest-value use cases were boilerplate generation and exploration of unfamiliar APIs. Setting up Playwright tests, configuring Turborepo, and implementing the marching squares algorithm all benefited from having a starting point to iterate on rather than a blank file.
+
+For the canvas animations specifically, I described the visual effect I wanted, reviewed the generated code, and then spent time understanding and refining it. The initial implementation worked but had performance issues—the topographic background was redrawing the entire canvas every frame. I caught this during review and restructured it to only redraw when necessary.
+
+### Where It Struggled
+
+Architectural decisions required more oversight. Early suggestions included patterns that would have been fine for a smaller project but didn't fit the monorepo structure—components importing directly from other packages' source files instead of through their public exports, test utilities duplicated across packages instead of shared.
+
+The generated code also tended toward verbosity. I frequently edited down implementations that were correct but longer than necessary. This isn't a major issue, but it means AI-assisted development isn't "describe and ship"—it's "describe, review, and refine."
+
+### The Mental Model Shift
+
+The real change was in what I attempted. Features I would have cut for time—comprehensive E2E tests, accessible mobile navigation with proper focus management, animated backgrounds—became feasible because the implementation cost dropped. Whether the code was better or worse than what I'd have written myself is hard to say, but more of the project got done.
+
+I still needed to understand every piece of code that went in. The review burden is real, and code you don't understand is a liability regardless of who wrote it.
+
+## Testing Strategy
+
+The test suite has two layers: Vitest for unit tests and Playwright for E2E tests.
+
+Unit tests focus on utilities and component rendering. I'm not testing implementation details—the tests verify that components render the expected content given specific props, not that they use particular CSS classes or internal state. This makes them resilient to refactoring.
+
+E2E tests cover critical user paths: navigation between pages, theme switching persistence, and mobile menu interactions. These are the tests that would catch a real regression that affects users. They're slower to run but provide confidence that the integrated system works.
+
+```bash
+pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e
+```
+
+This runs before every commit. The E2E suite adds about 30 seconds to the feedback loop, which is acceptable for the confidence it provides. If it grew significantly slower, I'd consider running it only in CI.
+
+What's not tested: visual appearance. I don't have visual regression tests, which means CSS changes could introduce bugs that the test suite wouldn't catch. This is a known gap—the cost of maintaining visual tests didn't seem worth it for a personal site.
+
+## Performance
+
+The production build produces a 89KB first-load JavaScript bundle for the home page, which is reasonable but not exceptional. The blog post pages are lighter at around 45KB since they're primarily static content.
+
+Core Web Vitals are solid—LCP under 1.5s, CLS near zero, INP well under the 200ms threshold. The canvas animations don't impact these metrics because they're non-blocking and don't affect layout.
+
+Build times are around 45 seconds for a full production build, with Turborepo caching making incremental builds nearly instant. This is fast enough that I don't think about it.
+
+## Conclusion
+
+Rebuilding a personal site is rarely the most efficient path forward, but efficiency isn't always the goal. This project was as much about learning current tools and rekindling interest in side projects as it was about having a functional website.
+
+The technical choices—monorepo architecture, Velite for content, canvas animations, AI-assisted development—each came with trade-offs. Some will prove to be the right call over time; others might turn out to be unnecessary complexity. The test suite and type safety give me confidence to revisit those decisions later without breaking what works today.
+
+The source is on [GitHub](https://github.com/BradMcGonigle/website) if you want to see the implementation details or steal any patterns that seem useful.
