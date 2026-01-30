@@ -61,9 +61,9 @@ describe("Header", () => {
       "href",
       "/links"
     );
-    expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Projects" })).toHaveAttribute(
       "href",
-      "/changelog"
+      "/projects"
     );
   });
 
@@ -139,7 +139,7 @@ describe("Header", () => {
       expect(mobileNav.querySelector('a[href="/blog"]')).toBeInTheDocument();
       expect(mobileNav.querySelector('a[href="/links"]')).toBeInTheDocument();
       expect(
-        mobileNav.querySelector('a[href="/changelog"]')
+        mobileNav.querySelector('a[href="/projects"]')
       ).toBeInTheDocument();
     });
 

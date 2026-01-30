@@ -9,7 +9,7 @@ const navigation = [
   { name: "About", href: "/about" },
   { name: "Blog", href: "/blog" },
   { name: "Links", href: "/links" },
-  { name: "Changelog", href: "/changelog" },
+  { name: "Projects", href: "/projects" },
 ] as const;
 
 export interface HeaderProps {

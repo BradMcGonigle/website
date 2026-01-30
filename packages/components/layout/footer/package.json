@@ -16,6 +16,7 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "peerDependencies": {
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
@@ -30,6 +31,7 @@
     "configs.vitest": "workspace:*",
     "eslint": "catalog:",
     "jsdom": "catalog:",
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:",
