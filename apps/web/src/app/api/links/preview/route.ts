@@ -363,6 +363,12 @@ function extractYouTubeVideoId(url: URL): string | null {
     if (shortsMatch?.[1]) {
       return shortsMatch[1];
     }
+
+    // /live/VIDEO_ID (live streams)
+    const liveMatch = /^\/live\/([^/?]+)/.exec(url.pathname);
+    if (liveMatch?.[1]) {
+      return liveMatch[1];
+    }
   }
 
   return null;
