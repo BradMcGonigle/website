@@ -1,0 +1,52 @@
+---
+title: What LLMs Won't Replace
+description: Writing code has never been the hard part of software engineering. The skills that actually matter—navigating ambiguity, making trade-offs, and aligning people—aren't going anywhere.
+date: 2025-01-31
+createdAt: 2025-01-31T00:00:00.000Z
+tags:
+  - Engineering
+  - AI
+  - Career
+---
+
+Every few months, a new wave of "software engineers are obsolete" takes floods my feed. The arguments are always the same: LLMs can write code now, so anyone who writes code is replaceable. It's a compelling narrative if you've never actually shipped software.
+
+Writing code has never been the hard part of this job. It's the most visible part, sure—the thing non-engineers can point to and understand. But if typing code into an editor were the primary challenge, we'd have solved software engineering decades ago with better IDEs and code completion.
+
+## The Actual Hard Parts
+
+The difficult work happens before and around the code: understanding what needs to be built in the first place, navigating the ambiguity that comes with every real-world requirement, and making trade-offs when there's no obviously correct answer.
+
+Consider a typical feature request: "users should be able to export their data." Sounds simple. But what format? CSV, JSON, PDF? All of them? What data exactly—everything they've ever created, or just active items? Should exports include data from integrated third-party services? What about data they've shared with others, or data others have shared with them? How do we handle exports for accounts with millions of records? Should there be rate limiting? Access controls?
+
+None of these questions have answers in the original requirement. Someone has to figure them out—through conversations with stakeholders, investigation of edge cases, and judgment calls about what matters most. That's not a task you can delegate to an LLM.
+
+Then there's architecture. Breaking complex problems into manageable pieces, designing systems that can evolve over time, and making decisions that your future self won't regret. This requires understanding not just what the code should do today, but how requirements might change, where the system might need to scale, and which abstractions will help versus hurt as the codebase grows.
+
+And perhaps most underrated: the human side. Aligning a team on technical direction. Influencing stakeholders toward realistic timelines. Explaining trade-offs to people who don't share your context. Building consensus when people disagree. Software is a team sport, and the coordination costs often exceed the implementation costs.
+
+## LLMs as Tools, Not Replacements
+
+I use LLMs regularly in my work. They're genuinely useful—like having a fast, somewhat unreliable colleague who's read a lot of documentation. They can generate boilerplate, explore unfamiliar APIs, and suggest implementations faster than I could write them from scratch.
+
+But I still review every line. I still need to understand whether the generated code fits the architecture. I still catch bugs, performance issues, and patterns that would cause problems down the line. The LLM doesn't know about the team's conventions, the system's constraints, or the product decisions that inform how this feature should actually work.
+
+[In my recent site rebuild](/blog/relaunching-my-personal-site), Claude Code helped me move faster on implementation details. But every architectural decision—the monorepo structure, the content layer choice, the testing strategy—required human judgment. The AI could generate code for any of those approaches; it couldn't tell me which approach was right for my specific situation with my specific constraints.
+
+This is the pattern I see consistently: LLMs accelerate the implementation phase, but they don't eliminate the understanding, planning, and decision-making that surround it. If anything, the ability to generate code faster makes those surrounding skills more important—you can produce bad code at unprecedented scale if you don't know what good looks like.
+
+## The Role That's Actually at Risk
+
+If someone's only contribution is writing code—taking fully-specified tickets and translating them into syntax without understanding why, questioning requirements, or pushing back on bad ideas—then yes, that role is probably at risk. But that's never been the full scope of software engineering.
+
+It wasn't the full scope before LLMs either. Pure "code typists" have always been less valuable than engineers who understand the problem space, communicate effectively, and make good decisions under uncertainty. LLMs just accelerate that dynamic.
+
+The engineers I respect most have always spent more time thinking than typing. They ask questions that clarify murky requirements. They push back on features that don't make sense. They design systems that are easier to change later. They help junior engineers grow. They translate technical constraints into terms stakeholders can understand. The code they write is almost a byproduct of all that other work.
+
+## What This Means Practically
+
+If you're worried about LLMs making you obsolete, the response isn't to learn prompting tricks or find ways to type code faster. It's to develop the skills that were always the actual job: understanding domains deeply, communicating clearly, making sound technical decisions, and delivering outcomes reliably.
+
+Learn to navigate ambiguity instead of waiting for perfect requirements. Practice breaking down complex problems into incremental deliverables. Get better at explaining technical trade-offs to non-technical people. Build relationships with the people you work with. These skills compound over time and become more valuable as the implementation costs drop.
+
+The tools will keep improving. The hard parts will stay hard.
