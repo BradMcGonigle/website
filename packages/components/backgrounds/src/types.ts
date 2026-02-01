@@ -7,7 +7,8 @@ export type BackgroundId =
   | "constellation"
   | "wave-interference"
   | "aurora"
-  | "voronoi";
+  | "voronoi"
+  | "mario-kart";
 
 export interface BackgroundConfig {
   id: BackgroundId;

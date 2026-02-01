@@ -5,6 +5,7 @@ import { ConstellationBackground } from "./constellation-background";
 import { WaveInterferenceBackground } from "./wave-interference-background";
 import { AuroraBackground } from "./aurora-background";
 import { VoronoiBackground } from "./voronoi-background";
+import { MarioKartBackground } from "./mario-kart-background";
 import type { BackgroundConfig } from "../types";
 
 export const backgrounds: BackgroundConfig[] = [
@@ -49,5 +50,11 @@ export const backgrounds: BackgroundConfig[] = [
     name: "Voronoi",
     description: "Animated Voronoi cell diagram",
     component: VoronoiBackground,
+  },
+  {
+    id: "mario-kart",
+    name: "Mario Kart",
+    description: "Rainbow road with item boxes and coins",
+    component: MarioKartBackground,
   },
 ];
