@@ -13,6 +13,7 @@
     "clean": "rm -rf .next .turbo node_modules e2e-results playwright-report"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.72.1",
     "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^1.0.14",
     "components.backgrounds": "workspace:*",
