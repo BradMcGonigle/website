@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import {
   checkRateLimit,
   RATE_LIMITS,
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
       { error: "Tag suggestions are not configured" },
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new OpenAI({ apiKey });
 
     const prompt = `You are a helpful assistant that suggests tags for a links page on a personal website. The website owner saves interesting links about web development, design, Apple products, and technology.
 
@@ -134,23 +134,22 @@ Important:
 - Be specific but not too granular
 - Suggest tags that would help organize and find this link later`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
       max_tokens: 100,
       messages: [{ role: "user", content: prompt }],
     });
 
     // Extract the text content from the response
-    const textContent = message.content.find((block) => block.type === "text");
-    if (textContent?.type !== "text") {
+    const message = completion.choices[0]?.message;
+    const responseText = message?.content?.trim();
+    if (!responseText) {
       return NextResponse.json(
         { error: "Failed to generate tag suggestions" },
         { status: 500 }
       );
     }
 
-    // Parse the JSON array from the response
-    const responseText = textContent.text.trim();
     let suggestedTags: string[];
 
     try {
