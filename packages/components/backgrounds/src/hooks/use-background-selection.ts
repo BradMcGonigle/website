@@ -12,16 +12,40 @@ interface UseBackgroundSelectionResult {
 }
 
 /**
+ * Get background ID from URL query parameter if valid.
+ */
+function getBackgroundFromUrl(): BackgroundId | null {
+  if (typeof window === "undefined") return null;
+
+  const params = new URLSearchParams(window.location.search);
+  const bgParam = params.get("bg");
+
+  if (bgParam && backgrounds.some((b) => b.id === bgParam)) {
+    return bgParam as BackgroundId;
+  }
+
+  return null;
+}
+
+/**
  * Hook to determine which background should be displayed.
- * Uses session storage for consistency within a session,
- * and falls back to date-based selection for new sessions.
+ * Priority: URL param (?bg=mario-kart) > session storage > date-based selection.
  */
 export function useBackgroundSelection(): UseBackgroundSelectionResult {
   const [currentBackground, setCurrentBackground] = useState<BackgroundId>("dot-grid");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check session storage first
+    // Check URL parameter first (allows mobile users to select backgrounds)
+    const urlBackground = getBackgroundFromUrl();
+    if (urlBackground) {
+      setCurrentBackground(urlBackground);
+      storeBackground(urlBackground);
+      setIsLoading(false);
+      return;
+    }
+
+    // Check session storage next
     const stored = getStoredBackground();
     if (stored) {
       setCurrentBackground(stored);
