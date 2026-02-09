@@ -31,8 +31,8 @@ catalogs:
       specifier: ^19.0.3
       version: 19.2.3
     autoprefixer:
-      specifier: ^10.4.20
-      version: 10.4.23
+      specifier: ^10.4.24
+      version: 10.4.24
     eslint:
       specifier: ^9.18.0
       version: 9.39.2
@@ -58,7 +58,7 @@ catalogs:
       specifier: ^16.1.5
       version: 16.1.6
     postcss:
-      specifier: ^8.4.49
+      specifier: ^8.5.6
       version: 8.5.6
     prettier:
       specifier: ^3.4.2
@@ -195,7 +195,7 @@ importers:
         version: 19.2.3(@types/react@19.2.9)
       autoprefixer:
         specifier: 'catalog:'
-        version: 10.4.23(postcss@8.5.6)
+        version: 10.4.24(postcss@8.5.6)
       configs.eslint:
         specifier: workspace:*
         version: link:../../configs/eslint
@@ -2423,8 +2423,8 @@ packages:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
     engines: {node: '>= 0.4'}
 
-  autoprefixer@10.4.23:
-    resolution: {integrity: sha512-YYTXSFulfwytnjAPlw8QHncHJmlvFKtczb8InXaAx9Q0LbfDnfEYDE55omerIJKihhmU61Ft+cAOSzQVaBUmeA==}
+  autoprefixer@10.4.24:
+    resolution: {integrity: sha512-uHZg7N9ULTVbutaIsDRoUkoS8/h3bdsmVJYZ5l3wv8Cp/6UIIoRDm90hZ+BwxUj/hGBEzLxdHNSKuFpn8WOyZw==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -5829,7 +5829,7 @@ snapshots:
 
   async-function@1.0.0: {}
 
-  autoprefixer@10.4.23(postcss@8.5.6):
+  autoprefixer@10.4.24(postcss@8.5.6):
     dependencies:
       browserslist: 4.28.1
       caniuse-lite: 1.0.30001766
