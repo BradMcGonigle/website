@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "prettier": "catalog:",
-    "prettier-plugin-tailwindcss": "catalog:",
-    "turbo": "catalog:",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "turbo": "2.8.1",
     "typescript": "catalog:"
   },
   "dependencies": {
