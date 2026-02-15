@@ -1,0 +1,89 @@
+---
+title: AI-Assisted iOS Development in Practice
+description: A day in the life of building an iOS app with an AI coding assistant—from Apple Reminders integration to live widget debugging at 9pm on a Saturday.
+date: 2025-02-14
+createdAt: 2025-02-14T00:00:00.000Z
+draft: true
+tags:
+  - iOS
+  - AI
+  - Swift
+  - Development
+---
+
+I spent today building features for Park Pulse, a native iOS app I'm working on for Walt Disney World wait times. But I wasn't coding alone—I had an AI assistant helping me through the entire process. Here's what that workflow actually looks like.
+
+## The Setup
+
+Park Pulse is a SwiftUI app targeting iOS 17+, built with zero third-party dependencies. It uses WidgetKit for home screen widgets, App Intents for Siri shortcuts, and talks to the ThemeParks.wiki API for live data. The codebase has a comprehensive `CLAUDE.md` file that documents architecture decisions, coding standards, and patterns—essentially a rulebook that both I and the AI follow.
+
+My task list lives in Apple Reminders, in a list called "Park Pulse - Ready to Implement." When I'm ready to work, I tell my AI assistant to check that list and start implementing.
+
+## The Workflow
+
+Here's how today actually went:
+
+**Morning:** I asked the assistant to pull my reminders and start on the first item—adding deep linking to the dining widget. It read the existing widget code, understood the pattern from the wait time widget, and implemented the feature. Build, deploy to my iPhone, test. Worked first try.
+
+**Afternoon:** Interactive itinerary widget with a "mark complete" button. This one was trickier—widgets can't have arbitrary interactivity, they need App Intents. The assistant figured out the pattern, implemented it, and we iterated on the UX. I wanted a 10-second "undo" window instead of instant completion. The assistant understood why (fat fingers happen) and implemented a pending state with timestamps.
+
+**Evening:** I'm at home, checking my widgets, and notice Casey's Corner (a quick service hot dog spot) shows "—" instead of "Open." I message the assistant: "Why are some quick service dining locations not showing Open?"
+
+Within minutes, it:
+1. Queried the live API to check what data Casey's Corner actually returns
+2. Discovered the API simply doesn't track quick service restaurants—no live data entry exists
+3. Found the code path that defaulted to "UNKNOWN" when no data was present
+4. Fixed it to assume "OPERATING" when the park is open and no explicit status exists
+5. Built and deployed to my phone
+
+I tested, confirmed it worked, and told it to commit and push. Done.
+
+## What Makes This Work
+
+A few things make this flow effective:
+
+**Context is king.** The `CLAUDE.md` file in my repo is ~500 lines of architectural decisions, code patterns, and conventions. The assistant reads it and follows the rules. When it adds a new feature, it follows the existing patterns. When I say "add a dashboard card," it knows exactly what that means and where the code goes.
+
+**Incremental deployment.** The assistant knows my device ID and the exact `xcrun devicectl` command to deploy. I can test changes on my actual phone within minutes of describing a problem. This tight feedback loop is crucial.
+
+**Domain knowledge accumulates.** The assistant remembers that I'm a Disney annual passholder, that I prefer casual communication, that I want to test before committing. It doesn't ask clarifying questions it already knows the answers to.
+
+**I stay in the loop.** The assistant doesn't commit until I approve. It doesn't push until I say so. For anything external-facing (messages, emails, public posts), it asks first. This isn't about distrust—it's about maintaining ownership of the final product.
+
+## The Casey's Corner Debugging Session
+
+Let me zoom in on that evening debugging session, because it illustrates the value clearly.
+
+Traditional debugging flow: Notice bug → Open Xcode → Find relevant code → Understand the data flow → Query the API manually → Form a hypothesis → Write a fix → Build → Test → Iterate.
+
+AI-assisted flow: Notice bug → Describe it in plain English → Get a fix deployed → Test → Approve commit.
+
+The assistant did all the intermediate steps—querying the API, reading the code, understanding the data model, finding the right fix. I just described the symptom and validated the solution.
+
+This isn't about being lazy. It's about spending my attention on the things that require human judgment: Is this the right UX? Does this behavior make sense? Is the fix correct? The mechanical work of navigating codebases and invoking tools is offloaded.
+
+## What Still Requires Human Judgment
+
+Despite the efficiency, plenty of decisions still need me:
+
+- **UX decisions:** The assistant can implement any interaction pattern I describe. Choosing the right one—like the 10-second undo window—requires understanding how people actually use the app.
+- **Priority calls:** Which feature matters most? When is something good enough to ship? These require product sense, not code sense.
+- **Architecture trade-offs:** When the assistant suggests an approach, I still evaluate whether it fits the system's future needs, not just today's requirements.
+- **Quality bar:** The assistant follows the patterns in `CLAUDE.md`, but I set that bar. If I accept sloppy code, I get more sloppy code.
+
+## The Meta-Point
+
+This workflow embodies what I wrote about in [What LLMs Won't Replace](/blog/what-llms-wont-replace). The AI accelerates implementation dramatically, but the surrounding skills—understanding requirements, making trade-offs, maintaining quality—remain firmly human responsibilities.
+
+The difference is that with faster implementation, I can iterate more. I can try an idea, see it on my phone, and decide whether it's right. That rapid feedback loop improves the final product more than any individual feature would.
+
+## Try It Yourself
+
+If you're building an iOS app (or anything, really), here's what I'd suggest:
+
+1. **Document your architecture.** A `CLAUDE.md` or `AGENTS.md` file that explains your patterns, conventions, and decisions. The AI will follow them.
+2. **Keep deployment fast.** The tighter your feedback loop, the more valuable the AI assistance becomes.
+3. **Stay in the approval loop.** Let the AI draft, but you decide what ships.
+4. **Describe problems, not solutions.** "Casey's Corner shows wrong status" is better than "change line 47 to return OPERATING." The AI might find a better fix than you imagined.
+
+This isn't the future of development. It's just today, on a Saturday, building an app I care about. But it's a pretty good today.
