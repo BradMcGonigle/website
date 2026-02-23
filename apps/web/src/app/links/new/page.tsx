@@ -14,6 +14,11 @@ interface ErrorResponse {
   error?: string;
 }
 
+interface TagSuggestionsResponse {
+  tags: string[];
+  existingTags: string[];
+}
+
 function NewLinkForm() {
   const searchParams = useSearchParams();
   const [apiKey, setApiKey] = useState("");
@@ -25,6 +30,8 @@ function NewLinkForm() {
   const [description, setDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [tags, setTags] = useState("");
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [suggestingTags, setSuggestingTags] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,6 +122,7 @@ function NewLinkForm() {
     setLoading(true);
     setError(null);
     setPreview(null);
+    setSuggestedTags([]);
 
     try {
       const response = await fetch("/api/links/preview", {
@@ -148,6 +156,57 @@ function NewLinkForm() {
       setLoading(false);
     }
   }, [url]);
+
+  const fetchTagSuggestions = useCallback(async () => {
+    if (!title.trim()) return;
+
+    setSuggestingTags(true);
+    setSuggestedTags([]);
+
+    try {
+      const response = await fetch("/api/links/suggest-tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: url.trim(),
+          title: title.trim(),
+          description: description.trim() || undefined,
+        }),
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+        throw new Error("Session expired. Please log in again.");
+      }
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as ErrorResponse;
+        throw new Error(errorData.error ?? "Failed to get tag suggestions");
+      }
+
+      const data = (await response.json()) as TagSuggestionsResponse;
+      setSuggestedTags(data.tags);
+    } catch (err) {
+      // Silently fail for tag suggestions - it's not critical
+      console.error("Tag suggestion error:", err);
+    } finally {
+      setSuggestingTags(false);
+    }
+  }, [url, title, description]);
+
+  const addSuggestedTag = (tag: string) => {
+    const currentTags = tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (!currentTags.includes(tag)) {
+      const newTags = [...currentTags, tag].join(", ");
+      setTags(newTags);
+    }
+    // Remove from suggestions
+    setSuggestedTags((prev) => prev.filter((t) => t !== tag));
+  };
 
   // Auto-fetch preview when URL is set from query param
   useEffect(() => {
@@ -199,6 +258,7 @@ function NewLinkForm() {
       setDescription("");
       setSelectedImage(null);
       setTags("");
+      setSuggestedTags([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save link");
     } finally {
@@ -401,12 +461,22 @@ function NewLinkForm() {
 
             {/* Tags */}
             <div>
-              <label
-                htmlFor="tags"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Tags (comma-separated)
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="tags"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Tags (comma-separated)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => void fetchTagSuggestions()}
+                  disabled={suggestingTags || !title.trim()}
+                  className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {suggestingTags ? "Getting suggestions..." : "Suggest tags"}
+                </button>
+              </div>
               <input
                 type="text"
                 id="tags"
@@ -415,6 +485,25 @@ function NewLinkForm() {
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                 placeholder="tech, article, tutorial"
               />
+              {suggestedTags.length > 0 && (
+                <div className="mt-2">
+                  <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
+                    Click to add:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestedTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => addSuggestedTag(tag)}
+                        className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 transition-colors hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                      >
+                        + {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit */}
