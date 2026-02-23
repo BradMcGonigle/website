@@ -26,6 +26,6 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "@vercel/toolbar": "^0.1.41"
+    "@vercel/toolbar": "^0.2.2"
   }
 }

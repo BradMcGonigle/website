@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "components.content.mdx": "workspace:*",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^0.575.0",
     "next": "catalog:"
   },
   "devDependencies": {
