@@ -210,6 +210,13 @@ function getImageExtension(url: string, contentType?: string): string {
   return "jpg";
 }
 
+class GitHubAuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GitHubAuthError";
+  }
+}
+
 async function commitToGitHub(
   files: FileToCommit[],
   message: string
@@ -218,7 +225,9 @@ async function commitToGitHub(
   const repo = process.env.GITHUB_REPO ?? "BradMcGonigle/website";
 
   if (!token) {
-    throw new Error("GITHUB_TOKEN is required");
+    throw new GitHubAuthError(
+      "GitHub token is not configured. Please set the GITHUB_TOKEN environment variable."
+    );
   }
 
   const [owner, repoName] = repo.split("/");
@@ -227,16 +236,27 @@ async function commitToGitHub(
   // Get the default branch
   const repoResponse = await fetch(baseUrl, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `token ${token}`,
       Accept: "application/vnd.github.v3+json",
     },
   });
 
   if (!repoResponse.ok) {
     const errorBody = await repoResponse.text();
-    throw new Error(
-      `Failed to get repo info: ${repoResponse.status} - ${errorBody}`
-    );
+    console.error(`GitHub API error (${repoResponse.status}):`, errorBody);
+
+    if (repoResponse.status === 401) {
+      throw new GitHubAuthError(
+        "GitHub token is invalid or expired. Please update the GITHUB_TOKEN environment variable with a valid personal access token."
+      );
+    }
+    if (repoResponse.status === 403) {
+      throw new GitHubAuthError(
+        "GitHub token does not have sufficient permissions. Please ensure the token has repo write access."
+      );
+    }
+
+    throw new Error(`Failed to get repo info: ${repoResponse.status}`);
   }
 
   const repoInfo = (await repoResponse.json()) as GitHubRepoResponse;
@@ -245,7 +265,7 @@ async function commitToGitHub(
   // Get the latest commit SHA
   const refResponse = await fetch(`${baseUrl}/git/ref/heads/${defaultBranch}`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `token ${token}`,
       Accept: "application/vnd.github.v3+json",
     },
   });
@@ -262,7 +282,7 @@ async function commitToGitHub(
     `${baseUrl}/git/commits/${latestCommitSha}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `token ${token}`,
         Accept: "application/vnd.github.v3+json",
       },
     }
@@ -282,7 +302,7 @@ async function commitToGitHub(
       const blobResponse = await fetch(`${baseUrl}/git/blobs`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `token ${token}`,
           Accept: "application/vnd.github.v3+json",
           "Content-Type": "application/json",
         },
@@ -312,7 +332,7 @@ async function commitToGitHub(
   const newTreeResponse = await fetch(`${baseUrl}/git/trees`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `token ${token}`,
       Accept: "application/vnd.github.v3+json",
       "Content-Type": "application/json",
     },
@@ -332,7 +352,7 @@ async function commitToGitHub(
   const newCommitResponse = await fetch(`${baseUrl}/git/commits`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `token ${token}`,
       Accept: "application/vnd.github.v3+json",
       "Content-Type": "application/json",
     },
@@ -356,7 +376,7 @@ async function commitToGitHub(
     {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `token ${token}`,
         Accept: "application/vnd.github.v3+json",
         "Content-Type": "application/json",
       },
@@ -453,9 +473,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Save link error:", error);
+
+    if (error instanceof GitHubAuthError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to save link",
+        error: "Failed to save link. Please try again later.",
       },
       { status: 500 }
     );
