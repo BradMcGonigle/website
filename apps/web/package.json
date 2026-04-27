@@ -33,7 +33,7 @@
     "pages.projects-list": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "rehype-pretty-code": "^0.14.1",
+    "rehype-pretty-code": "^0.14.3",
     "shiki": "^3.21.0"
   },
   "devDependencies": {
